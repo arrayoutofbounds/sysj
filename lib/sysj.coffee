@@ -30,11 +30,12 @@ module.exports = Sysj =
 
   ## compile the current file and then get the output
   compile: ->
-    console.log 'compiled'
-    if (true)
-      @sysjView.setText("Compiled successfully")
-    else
-      @sysjView.setText("Failed to compile")
+    #testing this method via console
+    #console.log 'compiled'
+    #if (true)
+    #  @sysjView.setText("Compiled successfully")
+    #else
+    #  @sysjView.setText("Failed to compile")
 
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
@@ -44,26 +45,28 @@ module.exports = Sysj =
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
 
+    ## get sysjc with exec command
     {exec} = require('child_process')
     exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc ' + filePath, (err, stdout, stderr) ->
-       (if (err)
-          console.log("child processes failed with error code: " + err.code)
-          atom.notifications.addError "Compilation "
-        else
-          console.log("HEYYY " + stdout))
+       (
+         if (stderr)
+            #console.log("child processes failed with error code: " + err.code)
+            atom.notifications.addError "Compilation failed", detail: stderr
+          else
+            atom.notifications.addSuccess "Compilation successful", detail: stdout
+            #console.log(stdout)
+            #atom.notifications.addInfo "err is ", detail: err
+       )
     )
 
-    {MessagePanelView, LineMessageView} = require 'atom-message-panel'
-
-    messages = new MessagePanelView
-        title: 'Remember your Coffee!'
-
-    messages.add new LineMessageView
-        line: 1
-        character: 4
-        message: 'You haven\'t had a single drop of coffee since this character'
 
 
+    # get sysjc with node-cmd. This is run async....so both happen at any time.
+    #cmd=require('node-cmd');
+    #cmd.get(
+    #    'sysjc ' + filePath,
+    #    (data) -> console.log("node-cmd used:" + data)
+    #)
 
     #exec('sysjc ' + filePath, (err, stdout, stderr) ->
     #   (if (err) then console.log("child processes failed with error code: " + err.code) else console.log(stdout))
