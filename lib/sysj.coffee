@@ -42,12 +42,28 @@ module.exports = Sysj =
     filePath = file?.path
     console.log filePath
 
+    packagePath = ""
+    paths = atom.packages.getAvailablePackagePaths()
+
+
+
+    findsysj = (p) ->
+      (
+        if (p.indexOf("sysj") > -1)
+          packagePath = packagePath + p
+          console.log packagePath
+      )
+    findsysj p for p in paths
+
+    pathToJar = packagePath + "/jar/*"
+    console.log pathToJar
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter ' + filePath
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
-
+    console.log command
     ## get sysjc with exec command
     {exec} = require('child_process')
-    exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc ' + filePath, (err, stdout, stderr) ->
+    exec(command , (err, stdout, stderr) ->
        (
          if (stderr)
             #console.log("child processes failed with error code: " + err.code)
@@ -59,6 +75,7 @@ module.exports = Sysj =
        )
     )
 
+    #'/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc ' + filePath
 
 
     # get sysjc with node-cmd. This is run async....so both happen at any time.
