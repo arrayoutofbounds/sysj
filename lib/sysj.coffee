@@ -4,12 +4,13 @@ SysjView = require './sysj-view'
 
 module.exports = Sysj =
   sysjView: null
-  modalPanel: null
+  #modalPanel: null
   subscriptions: null
 
   activate: (state) ->
-    @sysjView = new SysjView(state.sysjViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @sysjView.getElement(), visible: false)
+    @sysjView = SysjView.get(state.sysjViewState)
+
+    #@modalPanel = atom.workspace.addModalPanel(item: @sysjView.getElement(), visible: false)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -20,8 +21,9 @@ module.exports = Sysj =
     'sysj:run': => @run()
     #'sysj:toggle': => @toggle()
 
+
   deactivate: ->
-    @modalPanel.destroy()
+    #@modalPanel.destroy()
     @subscriptions.dispose()
     @sysjView.destroy()
 
@@ -108,17 +110,90 @@ module.exports = Sysj =
 
   # run the currently open file..which is the xml file and get the output
   run: ->
-    console.log 'run'
-    if (false)
-      @sysjView.setText("Ran successfully")
+    #console.log 'run'
+    #if (false)
+    #  @sysjView.setText("Ran successfully")
+    #else
+    #  @sysjView.setText("Failed to run")
+    editor = atom.workspace.getActivePaneItem()
+    file = editor?.buffer.file
+    filePath = file?.path
+    console.log filePath
+    dir = filePath.substring(0,filePath.lastIndexOf("/"))
+    console.log "dir is " + dir
+
+    packagePath = ""
+    paths = atom.packages.getAvailablePackagePaths()
+
+
+
+    findsysj = (p) ->
+      (
+        if (p.indexOf("sysj") > -1)
+          packagePath = packagePath + p
+          console.log packagePath
+      )
+    findsysj p for p in paths
+
+    pathToJar = packagePath + "/jar/*"
+    console.log pathToJar
+
+    a = 1
+    @OSName = ""
+    if (navigator.appVersion.indexOf("Win")!=-1)
+      @OSName="Windows"
+      a = 1
+    if (navigator.appVersion.indexOf("Mac")!=-1)
+      @OSName="MacOS"
+      a = 0
+    if (navigator.appVersion.indexOf("X11")!=-1)
+      @OSName="UNIX"
+      a = 0
+    if (navigator.appVersion.indexOf("Linux")!=-1)
+      @OSName="Linux"
+      a = 0
+
+    @pathToClass = ""
+    if (a)
+      @pathToClass = ";" + dir + "/"
     else
-      @sysjView.setText("Failed to run")
+      @pathToClass = ":" + dir + "/"
+
+    command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
+
+    #console.log "command is " + command
+
+    #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
+
+    { spawn } = require 'child_process'
+    @sysjr = spawn("java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+    @sysjr.stdout.on 'data', (data ) ->    SysjView.get().printOutput("#{data}") #atom.notifications.addSuccess "Run successful", detail: "#{data}"
+    @sysjr.stderr.on 'data', ( data ) ->   atom.notifications.addError "Run failed", detail: "#{data}"
+    @sysjr.on 'close', -> console.log "sysj program has finished executing."
+
+
+    ##{exec} = require('child_process')
+    #exec(command , (err, stdout, stderr) ->
+    #   (
+    #     if (stderr)
+    #        #console.log("child processes failed with error code: " + err.code)
+    #        atom.notifications.addError "Run failed", detail: stderr
+    #      else
+    #        atom.notifications.addSuccess "Run successful"
+    #        console.log "err is " + err
+    #        console.log "stdout is " +  stdout
+    #        console.log("stdout is " + stdout)
+    #        console.log(stdout)
+    #        atom.notifications.addInfo "err is ", detail: err
+    #   )
+    #)
+
     #if @modalPanel.isVisible()
     #  @modalPanel.hide()
     #else
     #  @sysjView.setText("Ran successfully")
     #  @modalPanel.show()
-###
+    ###
     toggle: ->
       console.log 'Sysj was toggled!'
 
@@ -126,4 +201,4 @@ module.exports = Sysj =
         @modalPanel.hide()
       else
         @modalPanel.show()
-  ###
+    ###
