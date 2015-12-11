@@ -7,8 +7,9 @@ class SysjView
       instance ?= new PrivateClass(state)
 
   class PrivateClass
-    {MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'
+    ##{MessagePanelView, LineMessageView, PlainMessageView} = require 'atom-message-panel'
     constructor: (serializedState) ->
+
       # Create root element
 
       #modal values below that are not needed
@@ -23,13 +24,35 @@ class SysjView
 
 
 
-      @messages = new MessagePanelView
-          title: 'Output'
+      #@messages = new MessagePanelView
+      #    title: 'Output'
 
-      @messages.attach()
+      #@messages.attach()
 
-      @messages.add new PlainMessageView
-            message: "Lets do some SystemJ!"
+      #@messages.add new PlainMessageView
+      #      message: "Lets do some SystemJ!"
+
+
+    setChildren: (value)->
+      if (value == 0)
+        @value = 0
+      else
+        @value = 1
+
+    getChildren: ->
+      @value
+
+    setRunning: (b)->
+      @running = b
+
+    getRunning: ->
+      @running
+
+    setConsolePanel: (consolePanel)->
+      @consolePanel = consolePanel
+
+    getConsolePanel: ->
+      @consolePanel
 
     # Returns an object that can be retrieved when package is activated
     serialize: ->
@@ -50,6 +73,6 @@ class SysjView
         atom.notifications.addError textToShow,
         dismissable: true
 
-    printOutput: (output) ->
-      @messages.add new PlainMessageView
-            message: "\n" + output
+    #printOutput: (output) ->
+    #  @messages.add new PlainMessageView
+    #        message: "\n" + output + "\n"

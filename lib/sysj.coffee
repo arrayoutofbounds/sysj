@@ -22,9 +22,14 @@ module.exports = Sysj =
     #'sysj:toggle': => @toggle()
 
 
+  consumeConsolePanel: (consolePanel) ->
+    @consolePanel = consolePanel
+    SysjView.get().setConsolePanel(@consolePanel)
+
   deactivate: ->
     #@modalPanel.destroy()
     @subscriptions.dispose()
+    @subscriptions = null
     @sysjView.destroy()
 
   serialize: ->
@@ -38,6 +43,7 @@ module.exports = Sysj =
     #  @sysjView.setText("Compiled successfully")
     #else
     #  @sysjView.setText("Failed to compile")
+
 
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
@@ -164,13 +170,29 @@ module.exports = Sysj =
     #console.log "command is " + command
 
     #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
+    process.env['parent'] = process.pid
+    console.log process.env['parent']
+    SysjView.get().setChildren(0)
+    console.log "children are " + SysjView.get().getChildren()
 
-    { spawn } = require 'child_process'
-    @sysjr = spawn("java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
-    @sysjr.stdout.on 'data', (data ) ->    SysjView.get().printOutput("#{data}") #atom.notifications.addSuccess "Run successful", detail: "#{data}"
-    @sysjr.stderr.on 'data', ( data ) ->   atom.notifications.addError "Run failed", detail: "#{data}"
-    @sysjr.on 'close', -> console.log "sysj program has finished executing."
-
+    if (SysjView.get().getChildren() == 0)
+      console.log "entered here"
+      { spawn } = require 'child_process'
+      @sysjr = spawn("java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+      SysjView.get().setChildren(1)
+      console.log "children are " + SysjView.get().getChildren()
+      @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
+      #console.log process.pid
+      #console.log @sysjr.pid
+      @sysjr.stderr.on 'data', ( data ) -> SysjView.get().getConsolePanel().error("#{data}")  #atom.notifications.addError "Run failed", detail: "#{data}"
+      @sysjr.on 'close', ->
+        SysjView.get().getConsolePanel().notice("sysj program has finished executing")#console.log "sysj program has finished executing." + process.id
+        SysjView.get().setChildren(0)
+      @sysjr.on 'exit', ->
+        SysjView.get().getConsolePanel().notice("sysj program has finished executing")#console.log "sysj program has finished executing." + process.id
+        SysjView.get().setChildren(0)
+    else
+      SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 
     ##{exec} = require('child_process')
     #exec(command , (err, stdout, stderr) ->
