@@ -21,6 +21,8 @@ module.exports = Sysj =
     'sysj:run': => @run()
     #'sysj:toggle': => @toggle()
 
+    SysjView.get().setChildren(0)
+
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
@@ -76,8 +78,10 @@ module.exports = Sysj =
          if (stderr)
             #console.log("child processes failed with error code: " + err.code)
             atom.notifications.addError "Compilation failed", detail: stderr
+            SysjView.get().getConsolePanel().warn(stderr)
           else
             atom.notifications.addSuccess "Compilation successful", detail: stdout
+            SysjView.get().getConsolePanel().log(stderr,level="info")
             #console.log(stdout)
             #atom.notifications.addInfo "err is ", detail: err
        )
@@ -172,7 +176,6 @@ module.exports = Sysj =
     #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
     process.env['parent'] = process.pid
     console.log process.env['parent']
-    SysjView.get().setChildren(0)
     console.log "children are " + SysjView.get().getChildren()
 
     if (SysjView.get().getChildren() == 0)
