@@ -19,6 +19,7 @@ module.exports = Sysj =
     @subscriptions.add atom.commands.add 'atom-workspace',
     'sysj:compile': => @compile()
     'sysj:run': => @run()
+    'sysj:kill': => @kill()
     #'sysj:toggle': => @toggle()
 
     SysjView.get().setChildren(0)
@@ -37,6 +38,19 @@ module.exports = Sysj =
   serialize: ->
     sysjViewState: @sysjView.serialize()
 
+  kill: ->
+    # get the parent pid from the env and then kill it using sigterm
+    terminate = require("terminate")
+    console.log process.env['parent']
+    terminate process.env['parent'],(err,done) ->
+      if err
+        console.log "oops " + err
+      else
+        console.log done
+        SysjView.get().setChildren(0)
+        console.log "children set to 0 so that sysj xml can be run again"
+      return
+
   ## compile the current file and then get the output
   compile: ->
     #testing this method via console
@@ -54,7 +68,7 @@ module.exports = Sysj =
 
     packagePath = ""
     paths = atom.packages.getAvailablePackagePaths()
-
+    dir = filePath.substring(0,filePath.lastIndexOf("/"))
 
 
     findsysj = (p) ->
@@ -67,7 +81,7 @@ module.exports = Sysj =
 
     pathToJar = packagePath + "/jar/*"
     console.log pathToJar
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter ' + filePath
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + ' ' + filePath
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
     console.log command

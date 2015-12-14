@@ -5,10 +5,10 @@
   "description": "A short description of your package",
   "keywords": [],
   "activationCommands": {
-  "atom-workspace": [
-    "sysj:compile",
-    "sysj:run"
-  ]
+    "atom-workspace": [
+      "sysj:compile",
+      "sysj:run"
+    ]
   },
   "repository": "https://github.com/atom/sysj",
   "license": "MIT",
@@ -16,7 +16,8 @@
     "atom": ">=1.0.0 <2.0.0"
   },
   "dependencies": {
-    "atom-message-panel": "1.2.4"
+    "atom-message-panel": "1.2.4",
+    "terminate": "1.0.6"
   },
   "devDependencies": {
     "grunt-shell": "~1.1.2"
