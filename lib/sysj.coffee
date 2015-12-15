@@ -25,6 +25,7 @@ module.exports = Sysj =
     SysjView.get().setChildren(0)
 
 
+
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
     SysjView.get().setConsolePanel(@consolePanel)
@@ -50,6 +51,42 @@ module.exports = Sysj =
         SysjView.get().setChildren(0)
         console.log "children set to 0 so that sysj xml can be run again"
       return
+
+
+  organise: (dir) ->
+    # this function organises the project as required
+
+    # move the java files from the class folder to a java folder
+    classFolderPath = dir + "/class"
+    javaFolderPath = dir + "/java"
+    fs = require('fs')
+
+    dirExists = (d) ->
+      fs = require("fs")
+      try
+        fs.statSync(d).isDirectory()
+      catch error
+        return false
+
+    if !dirExists(javaFolderPath)
+      fs.mkdir(javaFolderPath)
+
+    files = fs.readdirSync classFolderPath # sync read to ensure that all files are collected in an array before moving on
+    console.log files
+    i = 0
+    mv = require("mv")
+    path = require('path')
+    while i < files.length
+      #console.log files[i]
+      # if the file has a ".java" then move it to the java folder
+      if ( files[i].indexOf(".java") > -1)
+        mv classFolderPath + path.sep + files[i],javaFolderPath + path.sep + files[i], (err) ->
+          if err
+            console.error err
+          return
+      i++
+    return
+
 
   ## compile the current file and then get the output
   compile: ->
@@ -81,25 +118,39 @@ module.exports = Sysj =
 
     pathToJar = packagePath + "/jar/*"
     console.log pathToJar
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + ' ' + filePath
+
+    # this moves the class and java compiled files to the class folder
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' + filePath
+
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
     console.log command
     ## get sysjc with exec command
-    {exec} = require('child_process')
-    exec(command , (err, stdout, stderr) ->
-       (
-         if (stderr)
-            #console.log("child processes failed with error code: " + err.code)
-            atom.notifications.addError "Compilation failed", detail: stderr
-            SysjView.get().getConsolePanel().warn(stderr)
-          else
-            atom.notifications.addSuccess "Compilation successful", detail: stdout
-            SysjView.get().getConsolePanel().log(stderr,level="info")
-            #console.log(stdout)
-            #atom.notifications.addInfo "err is ", detail: err
-       )
-    )
+
+    #spawnSync = require('spawn-sync')
+    #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
+
+    doSomething = (organise,dir) ->
+
+      {exec} = require('child_process')
+      exec(command, (err, stdout, stderr) ->
+          (
+           if (stderr)
+              #console.log("child processes failed with error code: " + err.code)
+              atom.notifications.addError "Compilation failed", detail: stderr
+              SysjView.get().getConsolePanel().warn(stderr)
+            else
+              atom.notifications.addSuccess "Compilation successful", detail: stdout
+              SysjView.get().getConsolePanel().log(stdout,level="info")
+              organise dir
+              #console.log(stdout)
+              #atom.notifications.addInfo "err is ", detail: err
+              )
+          )
+
+    doSomething(@organise,dir)
+
+    #@organise dir # this function will organise the files itn the project
 
     #'/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc ' + filePath
 
@@ -131,6 +182,8 @@ module.exports = Sysj =
     #else
     #  @sysjView.setText("Compiled")
     #  @modalPanel.show()
+
+
 
   # run the currently open file..which is the xml file and get the output
   run: ->
@@ -179,9 +232,9 @@ module.exports = Sysj =
 
     @pathToClass = ""
     if (a)
-      @pathToClass = ";" + dir + "/"
+      @pathToClass = ";" + dir + "/class/"
     else
-      @pathToClass = ":" + dir + "/"
+      @pathToClass = ":" + dir + "/class/"
 
     command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
 
