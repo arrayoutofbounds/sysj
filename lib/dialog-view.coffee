@@ -5,7 +5,7 @@ module.exports =
       @element = document.createElement('div')
       @element.classList.add('dialog')
 
-      header = document.createElement('h3')
+      header = document.createElement('h1')
       header.textContent = 'Compile Options'
       header.classList.add('header','compile-options','block')
       @element.appendChild(header)
@@ -15,9 +15,9 @@ module.exports =
       @element.appendChild(body)
 
       input1  = document.createElement('input')
-      input1.textContent = "Enter compile option"
+      input1.placeholder = "Enter compile option"
       input1.setAttribute('id','input1')
-      input1.classList.add('compile-option-1')
+      input1.classList.add('compile-option','input1')
       input1.addEventListener("keydown", (event)->
         e = document.getElementById(input1.id)
         console.log "id is " + e.id
@@ -26,22 +26,59 @@ module.exports =
         console.log "key code is " + event.keyCode
         if event.keyCode == 8
           e.value = value.substring(0,value.length-1)
-      )
+          )
       body.appendChild(input1)
 
-      button = document.createElement('button')
-      button.textContent = "Compile"
-      button.classList.add('btn', 'btn-success', 'inline-block-tight')
-      button.addEventListener('click',@clicked)
-      @element.appendChild(button)
+      input2  = document.createElement('input')
+      input2.placeholder = "Enter arguments for this option"
+      input2.setAttribute('id','input2')
+      input2.classList.add('compile-option','input2')
+      input2.addEventListener("keydown", (event)->
+        e = document.getElementById(input2.id)
+        console.log "id is " + e.id
+        value = e.value
+        console.log "value is " + value
+        console.log "key code is " + event.keyCode
+        if event.keyCode == 8
+          e.value = value.substring(0,value.length-1)
+        )
+      body.appendChild(input2)
 
-    clicked: ->
-      console.log "this was clicked"
+
+      footer = document.createElement('div')
+      footer.classList.add('dialog-footer','block')
+      @element.appendChild(footer)
+
+      button1 = document.createElement('button')
+      button1.textContent = "Compile"
+      button1.setAttribute('id','btn1')
+      button1.classList.add('btn', 'btn-success', 'inline-block-tight','block','compile-button','btn-lg','button1')
+      button1.addEventListener('click',@clicked)
+      footer.appendChild(button1)
+
+      button2 = document.createElement('button')
+      button2.textContent = "Cancel"
+      button2.setAttribute('id','btn2')
+      button2.classList.add('btn', 'btn-warning', 'inline-block-tight','block','compile-button','btn-lg','button2')
+      button2.addEventListener('click',@clicked)
+      footer.appendChild(button2)
+
+    get: (id) ->
+      return document.getElementById(id)
+
+    clicked: (e)->
+      console.log "button is " + e.target.id
+      #return button.id
+      #Sysj = require './sysj
+      #console.log "this was clicked"
+      #Sysj.getModalPanel().hide()
 
     # Returns an object that can be retrieved when package is activated
     serialize: ->
+
     # Tear down any state and detach
     destroy: ->
       @element.remove()
+
     getElement: ->
       @element

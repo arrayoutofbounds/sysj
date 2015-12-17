@@ -2,12 +2,14 @@ SysjView = require './sysj-view'
 {CompositeDisposable} = require 'atom'
 DialogView = require './dialog-view'
 
-
 module.exports = Sysj =
   sysjView: null
   modalPanel: null
   subscriptions: null
   dialogView: null
+  flag: false
+  getModalPanel: ->
+    @modalPanel
 
   activate: (state) ->
     @sysjView = SysjView.get(state.sysjViewState)
@@ -106,6 +108,7 @@ module.exports = Sysj =
 
   ## compile the current file and then get the output
   compile: ->
+    Dialog = require './dialog-view'
     #testing this method via console
     #console.log 'compiled'
     #if (true)
