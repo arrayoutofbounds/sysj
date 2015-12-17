@@ -7,7 +7,8 @@
   "activationCommands": {
     "atom-workspace": [
       "sysj:compile",
-      "sysj:run"
+      "sysj:run",
+      "sysj:create"
     ]
   },
   "repository": "https://github.com/atom/sysj",
@@ -20,7 +21,8 @@
     "terminate": "1.0.6",
     "mv": "2.1.1",
     "sync-exec" : "0.6.2",
-    "spawn-sync": "1.0.14"
+    "spawn-sync": "1.0.14",
+    "atom-space-pen-views": "^2.0.3"
   },
   "devDependencies": {
     "grunt-shell": "~1.1.2"

@@ -1,16 +1,19 @@
 SysjView = require './sysj-view'
 {CompositeDisposable} = require 'atom'
+DialogView = require './dialog-view'
 
 
 module.exports = Sysj =
   sysjView: null
-  #modalPanel: null
+  modalPanel: null
   subscriptions: null
+  dialogView: null
 
   activate: (state) ->
     @sysjView = SysjView.get(state.sysjViewState)
 
-    #@modalPanel = atom.workspace.addModalPanel(item: @sysjView.getElement(), visible: false)
+    @dialogView = new DialogView()
+    @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
@@ -20,6 +23,7 @@ module.exports = Sysj =
     'sysj:compile': => @compile()
     'sysj:run': => @run()
     'sysj:kill': => @kill()
+    'sysj:create': => @create()
     #'sysj:toggle': => @toggle()
 
     SysjView.get().setChildren(0)
@@ -38,6 +42,18 @@ module.exports = Sysj =
 
   serialize: ->
     sysjViewState: @sysjView.serialize()
+
+  create: ->
+    remote = require 'remote'
+    dialog  = remote.require 'dialog'
+    directoryChosen =  dialog.showOpenDialog({properties:['openDirectory']}) # the user can create a directory and return it
+
+
+    editor = atom.workspace.getActivePaneItem()
+    file = editor?.buffer.file
+    filePath = file?.path
+    console.log filePath
+
 
   kill: ->
     # get the parent pid from the env and then kill it using sigterm
@@ -97,6 +113,8 @@ module.exports = Sysj =
     #else
     #  @sysjView.setText("Failed to compile")
 
+    if !@modalPanel.isVisible()
+      @modalPanel.show()
 
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
