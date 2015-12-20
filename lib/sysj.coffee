@@ -1,6 +1,6 @@
 SysjView = require './sysj-view'
 {CompositeDisposable} = require 'atom'
-DialogView = require './dialog-view'
+
 
 module.exports = Sysj =
   sysjView: null
@@ -8,28 +8,40 @@ module.exports = Sysj =
   subscriptions: null
   dialogView: null
   flag: false
+  clickHappened:false
+
   getModalPanel: ->
     @modalPanel
 
   activate: (state) ->
     @sysjView = SysjView.get(state.sysjViewState)
 
-    @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
+
+
+
 
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
     # Register command that toggles this view
     @subscriptions.add atom.commands.add 'atom-workspace',
-    'sysj:compile': => @compile()
+    'sysj:compile': => @showCompileDialog()
     'sysj:run': => @run()
     'sysj:kill': => @kill()
     'sysj:create': => @create()
     #'sysj:toggle': => @toggle()
 
-    SysjView.get().setChildren(0)
+    SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
 
+
+  showCompileDialog: ->
+    console.log "show dialog method is run"
+    DialogView = require './dialog-view'
+    @dialogView = new DialogView()
+    @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
+
+    if !@modalPanel.isVisible()
+      @modalPanel.show()
 
 
   consumeConsolePanel: (consolePanel) ->
@@ -55,7 +67,6 @@ module.exports = Sysj =
     file = editor?.buffer.file
     filePath = file?.path
     console.log filePath
-
 
   kill: ->
     # get the parent pid from the env and then kill it using sigterm
@@ -108,7 +119,6 @@ module.exports = Sysj =
 
   ## compile the current file and then get the output
   compile: ->
-    Dialog = require './dialog-view'
     #testing this method via console
     #console.log 'compiled'
     #if (true)
@@ -116,8 +126,24 @@ module.exports = Sysj =
     #else
     #  @sysjView.setText("Failed to compile")
 
-    if !@modalPanel.isVisible()
-      @modalPanel.show()
+
+    #console.log "click happened is " + @clickHappened
+
+    #console.log "dialog view is " + @dialogView
+
+
+    ###
+    foo =  =>
+      console.log "dialog view inside is " + #@dialogView
+      console.log "click happened is " + #@clickHappened
+      if #@clickHappened == false
+        setTimeout foo,1000
+      return
+
+    foo()
+    ###
+
+    #console.log "after waiting is " + @clickHappened
 
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file

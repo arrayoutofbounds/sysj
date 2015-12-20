@@ -1,5 +1,6 @@
 module.exports =
   class DialogView
+
     constructor: () ->
       # Create root element
       @element = document.createElement('div')
@@ -67,11 +68,31 @@ module.exports =
       return document.getElementById(id)
 
     clicked: (e)->
-      console.log "button is " + e.target.id
-      #return button.id
-      #Sysj = require './sysj
-      #console.log "this was clicked"
-      #Sysj.getModalPanel().hide()
+
+      #console.log "Clicked method is called"
+
+      #if e == undefined
+      #  return false
+
+      # e is the event.
+      Sysj = require './sysj'
+      Sysj.clickHappened = true
+      id =  e.target.id;
+
+      if id == 'btn1'
+        #compile
+        #return "compile"
+        Sysj.getModalPanel().hide()
+        Sysj.compile()
+      else if id == 'btn2'
+        Sysj.getModalPanel().hide()
+        console.log "closed compile dialog"
+        #return "close"
+        # close the modal
+      else
+        Sysj.getModalPanel().hide()
+        console.log "we have a problem and id is " + id
+
 
     # Returns an object that can be retrieved when package is activated
     serialize: ->
