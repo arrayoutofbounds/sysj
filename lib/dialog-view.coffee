@@ -4,6 +4,7 @@ module.exports =
     constructor: () ->
 
       @count = 0
+      @toAppend = ""
 
       # Create root element
       @element = document.createElement('div')
@@ -85,31 +86,31 @@ module.exports =
 
       input1  = document.createElement('input')
       input1.placeholder = "Enter compile option"
-      input1.setAttribute('id','input1')
+      input1.setAttribute('id','input' + @count)
       input1.classList.add('compile-option','input1',@count + "")
-      input1.addEventListener("keydown", (event)->
-        e = document.getElementById(input1.id)
-        console.log "id is " + e.id
-        value = e.value
+      input1.addEventListener("keyup", (event)->
+        #e = document.getElementById(input1.id)
+        console.log "id is " + input1.id
+        value = input1.value
         console.log "value is " + value
         console.log "key code is " + event.keyCode
         if event.keyCode == 8
-          e.value = value.substring(0,value.length-1)
+          input1.value = value.substring(0,value.length-1)
           )
       div.appendChild(input1)
 
       input2  = document.createElement('input')
       input2.placeholder = "Enter arguments for this option"
-      input2.setAttribute('id','input2')
+      input2.setAttribute('id','input' + @count)
       input2.classList.add('compile-option','input2',@count + "")
-      input2.addEventListener("keydown", (event)->
-        e = document.getElementById(input2.id)
-        console.log "id is " + e.id
-        value = e.value
+      input2.addEventListener("keyup", (event)->
+        #e = document.getElementById(input2.id)
+        console.log "id is " + input2.id
+        value = input2.value
         console.log "value is " + value
         console.log "key code is " + event.keyCode
         if event.keyCode == 8
-          e.value = value.substring(0,value.length-1)
+          input2.value = value.substring(0,value.length-1)
         )
       div.appendChild(input2)
 
@@ -132,33 +133,43 @@ module.exports =
       #console.log "body is " + @body
       @makeInput(@body)
 
-    clicked: (e)->
-
+    clicked: (e) =>
       #console.log "Clicked method is called"
-
+      console.log "to append is " + @toAppend
       #if e == undefined
       #  return false
-
       # e is the event.
       Sysj = require './sysj'
       Sysj.clickHappened = true
       id =  e.target.id;
 
+      console.log "count is " + @count
+
       if id == 'btn1'
-        inputs = document.getElementsByClassName(0 + "")
-        console.log inputs.length
+        i = 0
+        while i < @count
+          inputs = document.getElementsByClassName(i + "")
+          j=0
+          while j<2
+            console.log "input j is " + inputs[j].value
+            @toAppend = @toAppend + " " + inputs[j].value
+            j++
+          i++
+
+        console.log "to append is now" + @toAppend
+
         #compile
         #return "compile"
-        Sysj.getModalPanel().hide()
-        Sysj.compile()
+        Sysj.getModalPanel().destroy()
+        Sysj.compile(@toAppend)
         console.log "compile"
       else if id == 'btn2'
-        Sysj.getModalPanel().hide()
+        Sysj.getModalPanel().destroy()
         console.log "closed compile dialog"
         #return "close"
         # close the modal
       else
-        Sysj.getModalPanel().hide()
+        Sysj.getModalPanel().destroy()
         console.log "we have a problem and id is " + id
 
 

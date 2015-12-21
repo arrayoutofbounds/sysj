@@ -16,10 +16,6 @@ module.exports = Sysj =
   activate: (state) ->
     @sysjView = SysjView.get(state.sysjViewState)
 
-
-
-
-
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
@@ -39,6 +35,8 @@ module.exports = Sysj =
     DialogView = require './dialog-view'
     @dialogView = new DialogView()
     @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
+
+    @dialogView.toAppend = ""
 
     if !@modalPanel.isVisible()
       @modalPanel.show()
@@ -118,7 +116,7 @@ module.exports = Sysj =
 
 
   ## compile the current file and then get the output
-  compile: ->
+  compile: (toAppend) ->
     #testing this method via console
     #console.log 'compiled'
     #if (true)
