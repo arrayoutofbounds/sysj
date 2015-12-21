@@ -15,6 +15,7 @@ module.exports =
       body.classList.add('dialog-body','block')
       @element.appendChild(body)
 
+      ###
       input1  = document.createElement('input')
       input1.placeholder = "Enter compile option"
       input1.setAttribute('id','input1')
@@ -45,6 +46,13 @@ module.exports =
         )
       body.appendChild(input2)
 
+      span = document.createElement('span')
+      span.classList.add('icon', 'icon-file-add')
+      span.addEventListener('click', -> console.log "add new line of inputs")
+      body.appendChild(span)
+      ###
+
+      @makeInput(body)
 
       footer = document.createElement('div')
       footer.classList.add('dialog-footer','block')
@@ -63,6 +71,49 @@ module.exports =
       button2.classList.add('btn', 'btn-warning', 'inline-block-tight','block','compile-button','btn-lg','button2')
       button2.addEventListener('click',@clicked)
       footer.appendChild(button2)
+
+    makeInput: (body)->
+
+      div = document.createElement("div")
+      div.classList.add("block")
+
+      input1  = document.createElement('input')
+      input1.placeholder = "Enter compile option"
+      input1.setAttribute('id','input1')
+      input1.classList.add('compile-option','input1')
+      input1.addEventListener("keydown", (event)->
+        e = document.getElementById(input1.id)
+        console.log "id is " + e.id
+        value = e.value
+        console.log "value is " + value
+        console.log "key code is " + event.keyCode
+        if event.keyCode == 8
+          e.value = value.substring(0,value.length-1)
+          )
+      div.appendChild(input1)
+
+      input2  = document.createElement('input')
+      input2.placeholder = "Enter arguments for this option"
+      input2.setAttribute('id','input2')
+      input2.classList.add('compile-option','input2')
+      input2.addEventListener("keydown", (event)->
+        e = document.getElementById(input2.id)
+        console.log "id is " + e.id
+        value = e.value
+        console.log "value is " + value
+        console.log "key code is " + event.keyCode
+        if event.keyCode == 8
+          e.value = value.substring(0,value.length-1)
+        )
+      div.appendChild(input2)
+
+      span = document.createElement('span')
+      span.classList.add('icon', 'icon-file-add')
+      span.addEventListener('click', -> console.log "add new line of inputs")
+      div.appendChild(span)
+
+      body.appendChild(div)
+
 
     get: (id) ->
       return document.getElementById(id)
