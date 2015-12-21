@@ -11,9 +11,10 @@ module.exports =
       header.classList.add('header','compile-options','block')
       @element.appendChild(header)
 
-      body = document.createElement('div')
-      body.classList.add('dialog-body','block')
-      @element.appendChild(body)
+      @body = document.createElement('div')
+      @body.classList.add('dialog-body','block')
+      @body.setAttribute("id","body")
+      @element.appendChild(@body)
 
       ###
       input1  = document.createElement('input')
@@ -52,7 +53,7 @@ module.exports =
       body.appendChild(span)
       ###
 
-      @makeInput(body)
+      @makeInput(@body)
 
       footer = document.createElement('div')
       footer.classList.add('dialog-footer','block')
@@ -71,6 +72,8 @@ module.exports =
       button2.classList.add('btn', 'btn-warning', 'inline-block-tight','block','compile-button','btn-lg','button2')
       button2.addEventListener('click',@clicked)
       footer.appendChild(button2)
+
+
 
     makeInput: (body)->
 
@@ -109,14 +112,19 @@ module.exports =
 
       span = document.createElement('span')
       span.classList.add('icon', 'icon-file-add')
-      span.addEventListener('click', -> console.log "add new line of inputs")
+      span.addEventListener('click',@addNewInputs)
       div.appendChild(span)
 
       body.appendChild(div)
-
+      console.log "appended div to body"
 
     get: (id) ->
       return document.getElementById(id)
+
+
+    addNewInputs: =>
+      console.log "body is " + @body
+      @makeInput(@body)
 
     clicked: (e)->
 
