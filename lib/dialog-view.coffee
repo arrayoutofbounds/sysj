@@ -2,6 +2,9 @@ module.exports =
   class DialogView
 
     constructor: () ->
+
+      @count = 0
+
       # Create root element
       @element = document.createElement('div')
       @element.classList.add('dialog')
@@ -83,7 +86,7 @@ module.exports =
       input1  = document.createElement('input')
       input1.placeholder = "Enter compile option"
       input1.setAttribute('id','input1')
-      input1.classList.add('compile-option','input1')
+      input1.classList.add('compile-option','input1',@count + "")
       input1.addEventListener("keydown", (event)->
         e = document.getElementById(input1.id)
         console.log "id is " + e.id
@@ -98,7 +101,7 @@ module.exports =
       input2  = document.createElement('input')
       input2.placeholder = "Enter arguments for this option"
       input2.setAttribute('id','input2')
-      input2.classList.add('compile-option','input2')
+      input2.classList.add('compile-option','input2',@count + "")
       input2.addEventListener("keydown", (event)->
         e = document.getElementById(input2.id)
         console.log "id is " + e.id
@@ -110,6 +113,8 @@ module.exports =
         )
       div.appendChild(input2)
 
+      @count++ # increment count
+
       span = document.createElement('span')
       span.classList.add('icon', 'icon-file-add')
       span.addEventListener('click',@addNewInputs)
@@ -118,12 +123,13 @@ module.exports =
       body.appendChild(div)
       console.log "appended div to body"
 
+
     get: (id) ->
       return document.getElementById(id)
 
 
     addNewInputs: =>
-      console.log "body is " + @body
+      #console.log "body is " + @body
       @makeInput(@body)
 
     clicked: (e)->
@@ -139,10 +145,13 @@ module.exports =
       id =  e.target.id;
 
       if id == 'btn1'
+        inputs = document.getElementsByClassName(0 + "")
+        console.log inputs.length
         #compile
         #return "compile"
         Sysj.getModalPanel().hide()
         Sysj.compile()
+        console.log "compile"
       else if id == 'btn2'
         Sysj.getModalPanel().hide()
         console.log "closed compile dialog"
