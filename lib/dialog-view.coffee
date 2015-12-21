@@ -152,7 +152,10 @@ module.exports =
           j=0
           while j<2
             console.log "input j is " + inputs[j].value
-            @toAppend = @toAppend + " " + inputs[j].value
+            if @toAppend != ""
+              @toAppend = @toAppend + " " + inputs[j].value
+            else
+              @toAppend = inputs[j].value
             j++
           i++
 

@@ -152,6 +152,10 @@ module.exports = Sysj =
     paths = atom.packages.getAvailablePackagePaths()
     dir = filePath.substring(0,filePath.lastIndexOf("/"))
 
+    console.log "dir is " + dir
+
+    process.chdir(dir)
+
 
     findsysj = (p) ->
       (
@@ -165,7 +169,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' + filePath
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
