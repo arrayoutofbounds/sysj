@@ -56,10 +56,19 @@ module.exports = Sysj =
     sysjViewState: @sysjView.serialize()
 
   create: ->
+    fs = require('fs')
     remote = require 'remote'
     dialog  = remote.require 'dialog'
     directoryChosen =  dialog.showOpenDialog({properties:['openDirectory']}) # the user can create a directory and return it
 
+    # create the directories needed for a project
+    fs.mkdir(directoryChosen + "/source")
+    fs.mkdir(directoryChosen + "/class")
+    fs.mkdir(directoryChosen + "/config")
+    fs.mkdir(directoryChosen + "/java")
+    fs.mkdir(directoryChosen + "/projectSettings")
+    atom.project.addPath(directoryChosen + "")
+    atom.reload()
 
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
