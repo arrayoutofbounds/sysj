@@ -67,6 +67,11 @@ module.exports = Sysj =
     fs.mkdir(directoryChosen + "/config")
     fs.mkdir(directoryChosen + "/java")
     fs.mkdir(directoryChosen + "/projectSettings")
+    fs.writeFile(directoryChosen + "/projectSettings/compileOptions.json", "{}", (err) ->
+      if (err)
+        console.log "error occurred"
+      console.log "file saved"
+    )
     atom.project.addPath(directoryChosen + "")
     atom.reload()
 
