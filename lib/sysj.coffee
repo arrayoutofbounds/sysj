@@ -159,8 +159,10 @@ module.exports = Sysj =
 
     packagePath = ""
     paths = atom.packages.getAvailablePackagePaths()
-    dir = filePath.substring(0,filePath.lastIndexOf("/"))
+    dirToConfig = filePath.substring(0,filePath.lastIndexOf("/"))
+    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf("/"))
 
+    console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
 
     process.chdir(dir)
