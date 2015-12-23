@@ -75,10 +75,10 @@ module.exports = Sysj =
     atom.project.addPath(directoryChosen + "")
     atom.reload()
 
-    editor = atom.workspace.getActivePaneItem()
-    file = editor?.buffer.file
-    filePath = file?.path
-    console.log filePath
+    #editor = atom.workspace.getActivePaneItem()
+    #file = editor?.buffer.file
+    #filePath = file?.path
+    #console.log filePath
 
   kill: ->
     # get the parent pid from the env and then kill it using sigterm

@@ -5,6 +5,7 @@ module.exports =
 
       @count = 0
       @toAppend = ""
+      @path = require('path')
 
       # Create root element
       @element = document.createElement('div')
@@ -117,9 +118,15 @@ module.exports =
       @count++ # increment count
 
       span = document.createElement('span')
-      span.classList.add('icon', 'icon-file-add')
+      span.classList.add('icon', 'icon-file-add','plus')
       span.addEventListener('click',@addNewInputs)
       div.appendChild(span)
+
+      clear = document.createElement('button')
+      clear.textContent = "Clear"
+      clear.classList.add('btn')
+      clear.addEventListener('click',@clearInputs)
+      div.appendChild(clear)
 
       body.appendChild(div)
       console.log "appended div to body"
@@ -144,6 +151,25 @@ module.exports =
       id =  e.target.id;
 
       console.log "count is " + @count
+
+      jsonfile = require('jsonfile')
+
+      editor = atom.workspace.getActivePaneItem()
+      fileOpen = editor?.buffer.file
+      filePath = fileOpen?.path
+      dirToSubFolder = filePath.substring(0,filePath.lastIndexOf("/"))
+      dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf("/"))
+
+      file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
+      obj = {test:"workss"}
+
+      jsonfile.writeFile(file, obj, {spaces: 2}, (err) ->
+        if err
+          console.error(err)
+      )
+      jsonfile.readFile(file, (err, obj) ->
+        console.log(obj)
+      )
 
       if id == 'btn1'
         i = 0
