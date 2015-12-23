@@ -105,6 +105,8 @@ module.exports = Sysj =
     # move the java files from the class folder to a java folder
     classFolderPath = dir + "/class"
     javaFolderPath = dir + "/java"
+    configFolderPath = dir + "/config"
+    console.log "config path is " + configFolderPath
     fs = require('fs')
 
     dirExists = (d) ->
@@ -124,6 +126,12 @@ module.exports = Sysj =
     path = require('path')
     while i < files.length
       #console.log files[i]
+      if (files[i].indexOf(".xml") > -1)
+        mv classFolderPath + path.sep + files[i], configFolderPath + path.sep + files[i], (err) ->
+          if err
+            console.error err
+          return
+
       # if the file has a ".java" then move it to the java folder
       if ( files[i].indexOf(".java") > -1)
         mv classFolderPath + path.sep + files[i],javaFolderPath + path.sep + files[i], (err) ->
@@ -266,7 +274,8 @@ module.exports = Sysj =
     file = editor?.buffer.file
     filePath = file?.path
     console.log filePath
-    dir = filePath.substring(0,filePath.lastIndexOf("/"))
+    dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf("/"))
+    dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf("/"))
     console.log "dir is " + dir
 
     packagePath = ""
