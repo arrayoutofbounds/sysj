@@ -124,6 +124,7 @@ module.exports =
 
       clear = document.createElement('button')
       clear.textContent = "Clear"
+      clear.setAttribute("id","clearButton" + @count)
       clear.classList.add('btn')
       clear.addEventListener('click',@clearInputs)
       div.appendChild(clear)
@@ -135,6 +136,12 @@ module.exports =
     get: (id) ->
       return document.getElementById(id)
 
+
+    clearInputs: (e) ->
+      id = e.target.id
+      console.log id
+      document.getElementById(id).previousSibling.previousSibling.value = ""
+      document.getElementById(id).previousSibling.previousSibling.previousSibling.value = ""
 
     addNewInputs: =>
       #console.log "body is " + @body
