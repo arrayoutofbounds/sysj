@@ -72,6 +72,11 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
+    fs.writeFile(directoryChosen + "/projectSettings/pathsToExternalLibraries.txt", "", (err) ->
+      if (err)
+        console.log "error occurred"
+      console.log "file saved"
+    )
     atom.project.addPath(directoryChosen + "")
     atom.reload()
 
