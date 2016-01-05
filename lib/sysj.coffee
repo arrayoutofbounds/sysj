@@ -279,7 +279,7 @@ module.exports = Sysj =
     paths = atom.packages.getAvailablePackagePaths()
     dirToConfig = filePath.substring(0,filePath.lastIndexOf("/")) # path to the sub folder folder
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf("/")) # path to the overall project folder
-    dirToSourceFolder = dir + path.sep + "source"
+    dirToSourceFolder = dir + path.sep + "source" # this ensures that it can get the root directory if any file is open
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir

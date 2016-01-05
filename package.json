@@ -2,7 +2,8 @@
   "name": "sysj",
   "main": "./lib/sysj",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "Sysj",
+  "repository": "https://github.com/arrayoutofbounds/sysj",
   "keywords": [],
   "activationCommands": {
     "atom-workspace": [
@@ -12,7 +13,6 @@
       "sysj:compile all"
     ]
   },
-  "repository": "https://github.com/atom/sysj",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
