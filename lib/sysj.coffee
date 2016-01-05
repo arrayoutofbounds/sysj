@@ -148,8 +148,6 @@ module.exports = Sysj =
   ## compile the current file and then get the output
   compile: (toAppend) ->
 
-    initCp = SysjView.get().getConsolePanel()
-
     #testing this method via console
     #console.log 'compiled'
     #if (true)

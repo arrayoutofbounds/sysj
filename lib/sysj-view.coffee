@@ -52,6 +52,8 @@ class SysjView
       @consolePanel = consolePanel
 
     getConsolePanel: ->
+      if @consolePanel == undefined
+        @setConsolePanel()
       @consolePanel
 
     # Returns an object that can be retrieved when package is activated
