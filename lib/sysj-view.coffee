@@ -32,6 +32,7 @@ class SysjView
       #@messages.add new PlainMessageView
       #      message: "Lets do some SystemJ!"
 
+    consumeConsolePanel: (@consolePanel) ->
 
     setChildren: (value)->
       if (value == 0)
@@ -52,8 +53,6 @@ class SysjView
       @consolePanel = consolePanel
 
     getConsolePanel: ->
-      if @consolePanel == undefined
-        @setConsolePanel()
       @consolePanel
 
     # Returns an object that can be retrieved when package is activated
