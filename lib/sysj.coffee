@@ -148,7 +148,7 @@ module.exports = Sysj =
   ## compile the current file and then get the output
   compile: (toAppend) ->
 
-    SysjView.get().setConsolePanel(@consolePanel)
+    @consolePanel.log("working")
 
     #testing this method via console
     #console.log 'compiled'
@@ -212,7 +212,7 @@ module.exports = Sysj =
     ## get sysjc with exec command
     #spawnSync = require('spawn-sync')
     #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
-
+    SysjView.get().getConsolePanel().log("it works outside callback",level="info")
     doSomething = (organise,dir) ->
 
       {exec} = require('child_process')
