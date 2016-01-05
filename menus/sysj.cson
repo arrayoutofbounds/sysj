@@ -17,6 +17,10 @@
         {
             'label': 'Create new project'
             'command': 'sysj:create'
+        },
+        {
+            'label': 'Compile all'
+            'command': 'sysj:compile all'
         }
       ]
     ]

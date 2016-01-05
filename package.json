@@ -8,7 +8,8 @@
     "atom-workspace": [
       "sysj:compile",
       "sysj:run",
-      "sysj:create"
+      "sysj:create",
+      "sysj:compile all"
     ]
   },
   "repository": "https://github.com/atom/sysj",

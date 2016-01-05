@@ -25,6 +25,7 @@ module.exports = Sysj =
     'sysj:run': => @run()
     'sysj:kill': => @kill()
     'sysj:create': => @create()
+    'sysj:compile all': => @compileAll()
     #'sysj:toggle': => @toggle()
 
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
@@ -109,6 +110,7 @@ module.exports = Sysj =
     console.log "config path is " + configFolderPath
     fs = require('fs')
 
+    # this is a function used later on to check if a directory exists
     dirExists = (d) ->
       fs = require("fs")
       try
@@ -116,6 +118,7 @@ module.exports = Sysj =
       catch error
         return false
 
+    # if directory for java folder does not exist then make one
     if !dirExists(javaFolderPath)
       fs.mkdir(javaFolderPath)
 
@@ -264,7 +267,78 @@ module.exports = Sysj =
 
   compileAll: ->
     # this method compiles all the sysj files in the source folder
-    
+
+    path = require 'path'
+    fs = require('fs')
+    editor = atom.workspace.getActivePaneItem()
+    file = editor?.buffer.file
+    filePath = file?.path
+    console.log filePath
+
+    packagePath = "" # package path is the path to the sysj package
+    paths = atom.packages.getAvailablePackagePaths()
+    dirToConfig = filePath.substring(0,filePath.lastIndexOf("/")) # path to the sub folder folder
+    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf("/")) # path to the overall project folder
+    dirToSourceFolder = dir + path.sep + "source"
+
+    console.log "dirToConfig is " + dirToConfig
+    console.log "dir is " + dir
+    console.log "path to source folder is " + dirToSourceFolder
+
+
+    findsysj = (p) ->
+      (
+        if (p.indexOf("sysj") > -1)
+          packagePath = packagePath + p
+          console.log packagePath
+      )
+    findsysj p for p in paths # sets the package path to that of the sysj package
+
+    pathToJar = packagePath + "/jar/*" # path to jar is the path to package plus the jar folder.
+    console.log pathToJar
+
+    files = fs.readdirSync dirToSourceFolder
+    console.log files
+    i = 0
+    allSysjFiles = ""
+    while i < files.length
+      allSysjFiles = allSysjFiles + dirToSourceFolder + path.sep + files[i] + " "
+      i++
+
+
+    # go through the source folder and append the file path of each file
+
+
+    # this moves the class and java compiled files to the class folder
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' +  allSysjFiles
+
+    #exec = require('sync-exec')
+    #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
+    console.log command
+    ## get sysjc with exec command
+
+    #spawnSync = require('spawn-sync')
+    #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
+
+    doSomething = (organise,dir) ->
+
+      {exec} = require('child_process')
+      exec(command, (err, stdout, stderr) ->
+          (
+           if (stderr)
+              #console.log("child processes failed with error code: " + err.code)
+              atom.notifications.addError "Compilation failed", detail: stderr
+              SysjView.get().getConsolePanel().warn(stderr)
+            else
+              atom.notifications.addSuccess "Compilation successful", detail: stdout
+              SysjView.get().getConsolePanel().log(stdout,level="info")
+              organise dir
+              #console.log(stdout)
+              #atom.notifications.addInfo "err is ", detail: err
+              )
+          )
+
+    doSomething(@organise,dir)
 
   # run the currently open file..which is the xml file and get the output
   run: ->
