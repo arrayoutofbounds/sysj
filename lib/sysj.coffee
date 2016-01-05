@@ -262,6 +262,9 @@ module.exports = Sysj =
     #  @modalPanel.show()
 
 
+  compileAll: ->
+    # this method compiles all the sysj files in the source folder
+    
 
   # run the currently open file..which is the xml file and get the output
   run: ->
@@ -270,6 +273,7 @@ module.exports = Sysj =
     #  @sysjView.setText("Ran successfully")
     #else
     #  @sysjView.setText("Failed to run")
+    path = require('path')
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
     filePath = file?.path
@@ -294,6 +298,8 @@ module.exports = Sysj =
     pathToJar = packagePath + "/jar/*"
     console.log pathToJar
 
+    # a represents Windows
+    # rest represent unix or linux
     a = 1
     @OSName = ""
     if (navigator.appVersion.indexOf("Win")!=-1)
@@ -315,9 +321,23 @@ module.exports = Sysj =
     else
       @pathToClass = ":" + dir + "/class/"
 
-    command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
+    #command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
 
     #console.log "command is " + command
+
+    # READ path to external libraries and add each line to the class path
+    fs  = require("fs");
+    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
+    externalJars = ""
+    arrayLength = fileContentsArray.length
+    counter = 0
+    while counter < arrayLength
+      if a
+        externalJars = externalJars + ";" + fileContentsArray[counter]
+      else
+        externalJars = externalJars + ":" + fileContentsArray[counter]
+      counter++
+
 
     #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
     process.env['parent'] = process.pid
@@ -327,7 +347,7 @@ module.exports = Sysj =
     if (SysjView.get().getChildren() == 0)
       console.log "entered here"
       { spawn } = require 'child_process'
-      @sysjr = spawn("java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+      @sysjr = spawn("java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
       SysjView.get().setChildren(1)
       console.log "children are " + SysjView.get().getChildren()
       @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
