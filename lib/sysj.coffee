@@ -147,6 +147,9 @@ module.exports = Sysj =
 
   ## compile the current file and then get the output
   compile: (toAppend) ->
+
+    initCp = SysjView.get().getConsolePanel()
+
     #testing this method via console
     #console.log 'compiled'
     #if (true)
@@ -207,7 +210,6 @@ module.exports = Sysj =
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
     console.log command
     ## get sysjc with exec command
-
     #spawnSync = require('spawn-sync')
     #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
 
