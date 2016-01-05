@@ -1,7 +1,7 @@
 {
   "name": "sysj",
   "main": "./lib/sysj",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Sysj",
   "repository": "https://github.com/arrayoutofbounds/sysj",
   "keywords": [],
@@ -21,7 +21,7 @@
     "atom-message-panel": "1.2.4",
     "terminate": "1.0.6",
     "mv": "2.1.1",
-    "sync-exec" : "0.6.2",
+    "sync-exec": "0.6.2",
     "spawn-sync": "1.0.14",
     "wait-until": "0.0.2",
     "jsonfile": "2.2.3"
@@ -30,9 +30,9 @@
     "grunt-shell": "~1.1.2"
   },
   "consumedServices": {
-  "console-panel": {
-    "versions": {
-      "^1.0.0": "consumeConsolePanel"
+    "console-panel": {
+      "versions": {
+        "^1.0.0": "consumeConsolePanel"
       }
     }
   }
