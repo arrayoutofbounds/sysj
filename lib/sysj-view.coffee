@@ -32,8 +32,6 @@ class SysjView
       #@messages.add new PlainMessageView
       #      message: "Lets do some SystemJ!"
 
-    consumeConsolePanel: (@consolePanel) ->
-
     setChildren: (value)->
       if (value == 0)
         @value = 0
