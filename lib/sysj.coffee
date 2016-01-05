@@ -45,6 +45,7 @@ module.exports = Sysj =
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
+    @consolePanel.log("it is activated")
     SysjView.get().setConsolePanel(@consolePanel)
 
   deactivate: ->
