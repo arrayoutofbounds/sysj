@@ -36,7 +36,7 @@ module.exports = Sysj =
     console.log "show dialog method is run"
     DialogView = require '.' + path.sep + 'dialog-view'
     @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
+    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
 
     @dialogView.toAppend = ""
 
@@ -49,7 +49,7 @@ module.exports = Sysj =
     SysjView.get().setConsolePanel(@consolePanel)
 
   deactivate: ->
-    #@modalPanel.destroy()
+    @modalPanel.destroy()
     @subscriptions.dispose()
     @subscriptions = null
     @sysjView.destroy()
@@ -129,7 +129,6 @@ module.exports = Sysj =
     console.log files
     i = 0
     mv = require("mv")
-    path = require('path')
     while i < files.length
       #console.log files[i]
       if (files[i].indexOf(".xml") > -1)

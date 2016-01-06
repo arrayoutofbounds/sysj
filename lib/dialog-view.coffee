@@ -11,10 +11,13 @@ module.exports =
       @element = document.createElement('div')
       @element.classList.add('dialog')
 
+      top = document.createElement('div')
+      top.classList.add('top')
       header = document.createElement('h1')
       header.textContent = 'Compile Options'
-      header.classList.add('header','compile-options','block')
-      @element.appendChild(header)
+      header.classList.add('compileheader','compile-options')
+      top.appendChild(header)
+      @element.appendChild(top)
 
       @body = document.createElement('div')
       @body.classList.add('dialog-body','block')
