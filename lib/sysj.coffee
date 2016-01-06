@@ -32,8 +32,9 @@ module.exports = Sysj =
 
 
   showCompileDialog: ->
+    path = require 'path'
     console.log "show dialog method is run"
-    DialogView = require './dialog-view'
+    DialogView = require '.' + path.sep + 'dialog-view'
     @dialogView = new DialogView()
     @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
 
@@ -61,25 +62,27 @@ module.exports = Sysj =
     remote = require 'remote'
     dialog  = remote.require 'dialog'
     directoryChosen =  dialog.showOpenDialog({properties:['openDirectory']}) # the user can create a directory and return it
+    path = require('path')
 
     # create the directories needed for a project
-    fs.mkdir(directoryChosen + "/source")
-    fs.mkdir(directoryChosen + "/class")
-    fs.mkdir(directoryChosen + "/config")
-    fs.mkdir(directoryChosen + "/java")
-    fs.mkdir(directoryChosen + "/projectSettings")
-    fs.writeFile(directoryChosen + "/projectSettings/compileOptions.json", "{}", (err) ->
+    fs.mkdir(directoryChosen + path.sep + "source")
+    fs.mkdir(directoryChosen + path.sep + "class")
+    fs.mkdir(directoryChosen +  path.sep + "config")
+    fs.mkdir(directoryChosen + path.sep + "java")
+    fs.mkdir(directoryChosen +  path.sep + "projectSettings")
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
     )
-    fs.writeFile(directoryChosen + "/projectSettings/pathsToExternalLibraries.txt", "", (err) ->
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
     )
+    console.log "directory chosen is " + directoryChosen
     atom.project.addPath(directoryChosen + "")
-    atom.reload()
+    #atom.reload()
 
     #editor = atom.workspace.getActivePaneItem()
     #file = editor?.buffer.file
@@ -102,11 +105,11 @@ module.exports = Sysj =
 
   organise: (dir) ->
     # this function organises the project as required
-
+    path = require('path')
     # move the java files from the class folder to a java folder
-    classFolderPath = dir + "/class"
-    javaFolderPath = dir + "/java"
-    configFolderPath = dir + "/config"
+    classFolderPath = dir + path.sep + "class"
+    javaFolderPath = dir + path.sep + "java"
+    configFolderPath = dir + path.sep + "config"
     console.log "config path is " + configFolderPath
     fs = require('fs')
 
@@ -172,7 +175,7 @@ module.exports = Sysj =
     ###
 
     #console.log "after waiting is " + @clickHappened
-
+    path = require('path')
     editor = atom.workspace.getActivePaneItem()
     file = editor?.buffer.file
     filePath = file?.path
@@ -180,8 +183,8 @@ module.exports = Sysj =
 
     packagePath = ""
     paths = atom.packages.getAvailablePackagePaths()
-    dirToConfig = filePath.substring(0,filePath.lastIndexOf("/"))
-    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf("/"))
+    dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
+    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
@@ -197,11 +200,11 @@ module.exports = Sysj =
       )
     findsysj p for p in paths
 
-    pathToJar = packagePath + "/jar/*"
+    pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' + toAppend + " " + filePath
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -275,8 +278,8 @@ module.exports = Sysj =
 
     packagePath = "" # package path is the path to the sysj package
     paths = atom.packages.getAvailablePackagePaths()
-    dirToConfig = filePath.substring(0,filePath.lastIndexOf("/")) # path to the sub folder folder
-    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf("/")) # path to the overall project folder
+    dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + "")) # path to the sub folder folder
+    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + "")) # path to the overall project folder
     dirToSourceFolder = dir + path.sep + "source" # this ensures that it can get the root directory if any file is open
 
     console.log "dirToConfig is " + dirToConfig
@@ -292,7 +295,7 @@ module.exports = Sysj =
       )
     findsysj p for p in paths # sets the package path to that of the sysj package
 
-    pathToJar = packagePath + "/jar/*" # path to jar is the path to package plus the jar folder.
+    pathToJar = packagePath + path.sep + "jar" + path.sep + "*" # path to jar is the path to package plus the jar folder.
     console.log pathToJar
 
     files = fs.readdirSync dirToSourceFolder
@@ -308,7 +311,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + '/class ' +  allSysjFiles
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -350,8 +353,8 @@ module.exports = Sysj =
     file = editor?.buffer.file
     filePath = file?.path
     console.log filePath
-    dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf("/"))
-    dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf("/"))
+    dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
+    dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf(path.sep + ""))
     console.log "dir is " + dir
 
     packagePath = ""
@@ -367,7 +370,7 @@ module.exports = Sysj =
       )
     findsysj p for p in paths
 
-    pathToJar = packagePath + "/jar/*"
+    pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
     console.log pathToJar
 
     # a represents Windows
@@ -389,9 +392,9 @@ module.exports = Sysj =
 
     @pathToClass = ""
     if (a)
-      @pathToClass = ";" + dir + "/class/"
+      @pathToClass = ";" + dir + path.sep + "class" + path.sep
     else
-      @pathToClass = ":" + dir + "/class/"
+      @pathToClass = ":" + dir + path.sep + "class" + path.sep
 
     #command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
 

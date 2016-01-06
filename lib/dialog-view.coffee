@@ -153,7 +153,7 @@ module.exports =
       #if e == undefined
       #  return false
       # e is the event.
-      Sysj = require './sysj'
+      Sysj = require '.' + @path.sep + 'sysj'
       Sysj.clickHappened = true
       id =  e.target.id;
 
@@ -164,8 +164,8 @@ module.exports =
       editor = atom.workspace.getActivePaneItem()
       fileOpen = editor?.buffer.file
       filePath = fileOpen?.path
-      dirToSubFolder = filePath.substring(0,filePath.lastIndexOf("/"))
-      dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf("/"))
+      dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))
+      dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf(@path.sep + ""))
 
       file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
       obj = {test:"workss"}
