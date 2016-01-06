@@ -36,7 +36,7 @@ module.exports = Sysj =
     console.log "show dialog method is run"
     DialogView = require '.' + path.sep + 'dialog-view'
     @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addModalPanel(item: @dialogView.getElement(), visible: false)
+    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
 
     @dialogView.toAppend = ""
 

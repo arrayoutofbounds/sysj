@@ -122,13 +122,13 @@ module.exports =
       span.addEventListener('click',@addNewInputs)
       div.appendChild(span)
 
-      clear = document.createElement('button')
+      ###clear = document.createElement('button')
       clear.textContent = "Clear"
       clear.setAttribute("id","clearButton" + @count)
       clear.classList.add('btn')
       clear.addEventListener('click',@clearInputs)
       div.appendChild(clear)
-
+      ###
       body.appendChild(div)
       console.log "appended div to body"
 
