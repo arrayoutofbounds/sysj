@@ -1,4 +1,4 @@
-SysjView = require './sysj-view'
+SysjView = require '../lib/sysj-view'
 {CompositeDisposable} = require 'atom'
 
 
@@ -33,9 +33,9 @@ module.exports = Sysj =
 
   showCompileDialog: ->
     path = require 'path'
-    console.log path.sep
+    #console.log path.sep #checks that the path is different for windows and linux
     console.log "show dialog method is run"
-    DialogView = require '.' + path.sep + 'dialog-view'
+    DialogView = require '..' + path.sep + "lib" + path.sep + 'dialog-view'
     @dialogView = new DialogView()
     @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
 
@@ -189,7 +189,7 @@ module.exports = Sysj =
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
 
-    process.chdir(dir)
+    process.chdir(dir) # change dir to the working directory so config-gen and other dir specific things work
 
 
     findsysj = (p) ->

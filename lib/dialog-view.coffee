@@ -156,7 +156,7 @@ module.exports =
       #if e == undefined
       #  return false
       # e is the event.
-      Sysj = require '.' + @path.sep + 'sysj'
+      Sysj = require '..' + @path.sep + "lib" + @path.sep + 'sysj'
       Sysj.clickHappened = true
       id =  e.target.id;
 
