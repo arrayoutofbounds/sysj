@@ -98,11 +98,11 @@ module.exports = Sysj =
       if err
         console.log "oops " + err
       else
-        console.log done
-        SysjView.get().setChildren(0)
+        console.log "done"
+        SysjView.get().setChildren(0) # set it to 0 so it can run again
         console.log "children set to 0 so that sysj xml can be run again"
       return
-
+    
 
   organise: (dir) ->
     # this function organises the project as required

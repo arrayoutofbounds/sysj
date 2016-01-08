@@ -22,7 +22,8 @@
     "mv": "2.1.1",
     "sync-exec": "0.6.2",
     "spawn-sync": "1.0.14",
-    "jsonfile": "2.2.3"
+    "jsonfile": "2.2.3",
+    "ps-node": "0.0.5"
   },
   "consumedServices": {
     "console-panel": {
