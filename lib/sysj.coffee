@@ -1,5 +1,4 @@
-pathSep = require("path")
-SysjView = require('.' + pathSep.sep + 'sysj-view')
+SysjView = require './sysj-view'
 {CompositeDisposable} = require 'atom'
 
 
@@ -35,7 +34,7 @@ module.exports = Sysj =
   showCompileDialog: ->
     path = require 'path'
     console.log "show dialog method is run"
-    DialogView = require('.' + path.sep + 'dialog-view')
+    DialogView = require './dialog-view'
     @dialogView = new DialogView()
     @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
 
