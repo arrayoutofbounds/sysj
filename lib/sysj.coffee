@@ -1,4 +1,5 @@
-SysjView = require './sysj-view'
+pathSep = require("path")
+SysjView = require('.' + pathSep.sep + 'sysj-view')
 {CompositeDisposable} = require 'atom'
 
 
@@ -34,9 +35,9 @@ module.exports = Sysj =
   showCompileDialog: ->
     path = require 'path'
     console.log "show dialog method is run"
-    DialogView = require '.' + path.sep + 'dialog-view'
+    DialogView = require('.' + path.sep + 'dialog-view')
     @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
+    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
 
     @dialogView.toAppend = ""
 
@@ -60,7 +61,7 @@ module.exports = Sysj =
   create: ->
     fs = require('fs')
     remote = require 'remote'
-    dialog  = remote.require 'dialog'
+    dialog  = remote.require 'dialog' # this is for opening the choose dir dialog
     directoryChosen =  dialog.showOpenDialog({properties:['openDirectory']}) # the user can create a directory and return it
     path = require('path')
 
