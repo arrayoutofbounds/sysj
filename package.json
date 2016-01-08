@@ -1,7 +1,7 @@
 {
   "name": "sysj",
   "main": "./lib/sysj",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Helps compile and run SystemJ programs",
   "repository": "https://github.com/arrayoutofbounds/sysj",
   "keywords": [],
