@@ -38,12 +38,10 @@ module.exports = Sysj =
     DialogView = require '..' + path.sep + "lib" + path.sep + 'dialog-view'
     @dialogView = new DialogView()
     @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
-
     @dialogView.toAppend = ""
 
     if !@modalPanel.isVisible()
       @modalPanel.show()
-
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
@@ -94,16 +92,25 @@ module.exports = Sysj =
     # get the parent pid from the env and then kill it using sigterm
     terminate = require("terminate")
     console.log process.env['parent']
+
+    ###kill = require('tree-kill')
+    kill process.env['child_pid'],'SIGKILL', (err) ->
+      if err
+        console.log "error occurred is " + err
+      else
+        SysjView.get().setChildren(0) # set it to 0 so it can run again
+        console.log "children set to 0 so that sysj xml can be run again"
+      return
+    ###
     terminate process.env['parent'],(err,done) ->
       if err
         console.log "oops " + err
       else
-        console.log "done"
+        console.log done
         SysjView.get().setChildren(0) # set it to 0 so it can run again
         console.log "children set to 0 so that sysj xml can be run again"
       return
-    
-
+      
   organise: (dir) ->
     # this function organises the project as required
     path = require('path')
@@ -150,6 +157,7 @@ module.exports = Sysj =
 
   ## compile the current file and then get the output
   compile: (toAppend) ->
+    console.log "this process is " + process.pid
     #testing this method via console
     #console.log 'compiled'
     #if (true)
@@ -343,6 +351,7 @@ module.exports = Sysj =
 
   # run the currently open file..which is the xml file and get the output
   run: ->
+    console.log "this process is " + process.pid
     #console.log 'run'
     #if (false)
     #  @sysjView.setText("Ran successfully")
@@ -416,7 +425,7 @@ module.exports = Sysj =
 
     #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
     process.env['parent'] = process.pid
-    console.log process.env['parent']
+    console.log " the id stored in process.env parent is " + process.env['parent']
     console.log "children are " + SysjView.get().getChildren()
 
     if (SysjView.get().getChildren() == 0)
@@ -426,14 +435,17 @@ module.exports = Sysj =
       SysjView.get().setChildren(1)
       console.log "children are " + SysjView.get().getChildren()
       @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
-      #console.log process.pid
-      #console.log @sysjr.pid
+      console.log process.pid
+      console.log @sysjr.pid
       @sysjr.stderr.on 'data', ( data ) -> SysjView.get().getConsolePanel().error("#{data}")  #atom.notifications.addError "Run failed", detail: "#{data}"
+      # if the process spawned closes or exits
+      pid = @sysjr.pid
+      process.env['child_pid'] = pid
       @sysjr.on 'close', ->
-        SysjView.get().getConsolePanel().notice("sysj program has finished executing")#console.log "sysj program has finished executing." + process.id
+        SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
         SysjView.get().setChildren(0)
       @sysjr.on 'exit', ->
-        SysjView.get().getConsolePanel().notice("sysj program has finished executing")#console.log "sysj program has finished executing." + process.id
+        SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
         SysjView.get().setChildren(0)
     else
       SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
