@@ -93,7 +93,7 @@ module.exports = Sysj =
     terminate = require("terminate")
     console.log process.env['parent']
 
-    ###kill = require('tree-kill')
+    kill = require('tree-kill')
     kill process.env['child_pid'],'SIGKILL', (err) ->
       if err
         console.log "error occurred is " + err
@@ -110,7 +110,7 @@ module.exports = Sysj =
         SysjView.get().setChildren(0) # set it to 0 so it can run again
         console.log "children set to 0 so that sysj xml can be run again"
       return
-      
+      ###
   organise: (dir) ->
     # this function organises the project as required
     path = require('path')
