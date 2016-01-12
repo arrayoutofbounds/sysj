@@ -157,6 +157,7 @@ module.exports =
       #  return false
       # e is the event.
       Sysj = require '..' + @path.sep + "lib" + @path.sep + 'sysj'
+      SysjView = require '..' + @path.sep + "lib" + @path.sep + 'sysj-view'
       Sysj.clickHappened = true
       id =  e.target.id;
 
@@ -167,49 +168,54 @@ module.exports =
       editor = atom.workspace.getActivePaneItem()
       fileOpen = editor?.buffer.file
       filePath = fileOpen?.path
-      dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))
-      dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf(@path.sep + ""))
 
-      file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
-      obj = {test:"workss"}
-
-      jsonfile.writeFile(file, obj, {spaces: 2}, (err) ->
-        if err
-          console.error(err)
-      )
-      jsonfile.readFile(file, (err, obj) ->
-        console.log(obj)
-      )
-
-      if id == 'btn1'
-        i = 0
-        while i < @count
-          inputs = document.getElementsByClassName(i + "")
-          j=0
-          while j<2
-            console.log "input j is " + inputs[j].value
-            if @toAppend != ""
-              @toAppend = @toAppend + " " + inputs[j].value
-            else
-              @toAppend = inputs[j].value
-            j++
-          i++
-
-        console.log "to append is now" + @toAppend
-
-        #compile
-        #return "compile"
+      if filePath == undefined
+        SysjView.get().getConsolePanel().warn("ctrl-s compiles the current sysj file open. Please open a file in the editor before proceeding.")
         Sysj.getModalPanel().destroy()
-        Sysj.compile(@toAppend)
-        console.log "compile"
-      else if id == 'btn2'
-        Sysj.getModalPanel().destroy()
-        console.log "closed compile dialog"
-        #return "close"
-        # close the modal
       else
-        Sysj.getModalPanel().destroy()
-        console.log "we have a problem and id is " + id
+        dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))
+        dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf(@path.sep + ""))
+
+        file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
+        obj = {test:"workss"}
+
+        jsonfile.writeFile(file, obj, {spaces: 2}, (err) ->
+          if err
+            console.error(err)
+        )
+        jsonfile.readFile(file, (err, obj) ->
+          console.log(obj)
+        )
+
+        if id == 'btn1'
+          i = 0
+          while i < @count
+            inputs = document.getElementsByClassName(i + "")
+            j=0
+            while j<2
+              console.log "input j is " + inputs[j].value
+              if @toAppend != ""
+                @toAppend = @toAppend + " " + inputs[j].value
+              else
+                @toAppend = inputs[j].value
+              j++
+            i++
+
+          console.log "to append is now" + @toAppend
+
+          #compile
+          #return "compile"
+          Sysj.getModalPanel().destroy()
+          Sysj.compile(@toAppend)
+          console.log "compile"
+        else if id == 'btn2'
+          Sysj.getModalPanel().destroy()
+          console.log "closed compile dialog"
+          #return "close"
+          # close the modal
+        else
+          Sysj.getModalPanel().destroy()
+          console.log "we have a problem and id is " + id
 
 
     # Returns an object that can be retrieved when package is activated

@@ -369,8 +369,6 @@ module.exports = Sysj =
     packagePath = ""
     paths = atom.packages.getAvailablePackagePaths()
 
-
-
     findsysj = (p) ->
       (
         if (p.indexOf("sysj") > -1)
