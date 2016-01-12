@@ -362,91 +362,94 @@ module.exports = Sysj =
     file = editor?.buffer.file
     filePath = file?.path
     console.log filePath
-    dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
-    dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf(path.sep + ""))
-    console.log "dir is " + dir
+    if filePath == undefined
+      window.alert("ctrl-alt-a runs the current xml file open. Please open a xml config file in the editor before proceeding.")
+    else
+      dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
+      dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf(path.sep + ""))
+      console.log "dir is " + dir
 
-    packagePath = ""
-    paths = atom.packages.getAvailablePackagePaths()
+      packagePath = ""
+      paths = atom.packages.getAvailablePackagePaths()
 
-    findsysj = (p) ->
-      (
-        if (p.indexOf("sysj") > -1)
-          packagePath = packagePath + p
-          console.log packagePath
-      )
-    findsysj p for p in paths
+      findsysj = (p) ->
+        (
+          if (p.indexOf("sysj") > -1)
+            packagePath = packagePath + p
+            console.log packagePath
+        )
+      findsysj p for p in paths
 
-    pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
-    console.log pathToJar
+      pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
+      console.log pathToJar
 
-    # a represents Windows
-    # rest represent unix or linux
-    a = 1
-    @OSName = ""
-    if (navigator.appVersion.indexOf("Win")!=-1)
-      @OSName="Windows"
+      # a represents Windows
+      # rest represent unix or linux
       a = 1
-    if (navigator.appVersion.indexOf("Mac")!=-1)
-      @OSName="MacOS"
-      a = 0
-    if (navigator.appVersion.indexOf("X11")!=-1)
-      @OSName="UNIX"
-      a = 0
-    if (navigator.appVersion.indexOf("Linux")!=-1)
-      @OSName="Linux"
-      a = 0
+      @OSName = ""
+      if (navigator.appVersion.indexOf("Win")!=-1)
+        @OSName="Windows"
+        a = 1
+      if (navigator.appVersion.indexOf("Mac")!=-1)
+        @OSName="MacOS"
+        a = 0
+      if (navigator.appVersion.indexOf("X11")!=-1)
+        @OSName="UNIX"
+        a = 0
+      if (navigator.appVersion.indexOf("Linux")!=-1)
+        @OSName="Linux"
+        a = 0
 
-    @pathToClass = ""
-    if (a)
-      @pathToClass = ";" + dir + path.sep + "class" + path.sep
-    else
-      @pathToClass = ":" + dir + path.sep + "class" + path.sep
-
-    #command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
-
-    #console.log "command is " + command
-
-    # READ path to external libraries and add each line to the class path
-    fs  = require("fs");
-    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
-    externalJars = ""
-    arrayLength = fileContentsArray.length
-    counter = 0
-    while counter < arrayLength
-      if a
-        externalJars = externalJars + ";" + fileContentsArray[counter]
+      @pathToClass = ""
+      if (a)
+        @pathToClass = ";" + dir + path.sep + "class" + path.sep
       else
-        externalJars = externalJars + ":" + fileContentsArray[counter]
-      counter++
+        @pathToClass = ":" + dir + path.sep + "class" + path.sep
+
+      #command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
+
+      #console.log "command is " + command
+
+      # READ path to external libraries and add each line to the class path
+      fs  = require("fs");
+      fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
+      externalJars = ""
+      arrayLength = fileContentsArray.length
+      counter = 0
+      while counter < arrayLength
+        if a
+          externalJars = externalJars + ";" + fileContentsArray[counter]
+        else
+          externalJars = externalJars + ":" + fileContentsArray[counter]
+        counter++
 
 
-    #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
-    process.env['parent'] = process.pid
-    console.log " the id stored in process.env parent is " + process.env['parent']
-    console.log "children are " + SysjView.get().getChildren()
-
-    if (SysjView.get().getChildren() == 0)
-      console.log "entered here"
-      { spawn } = require 'child_process'
-      @sysjr = spawn("java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
-      SysjView.get().setChildren(1)
+      #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
+      process.env['parent'] = process.pid
+      console.log " the id stored in process.env parent is " + process.env['parent']
       console.log "children are " + SysjView.get().getChildren()
-      @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
-      console.log process.pid
-      console.log @sysjr.pid
-      @sysjr.stderr.on 'data', ( data ) -> SysjView.get().getConsolePanel().error("#{data}")  #atom.notifications.addError "Run failed", detail: "#{data}"
-      # if the process spawned closes or exits
-      pid = @sysjr.pid
-      process.env['child_pid'] = pid
-      @sysjr.on 'close', ->
-        SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
-        SysjView.get().setChildren(0)
-      @sysjr.on 'exit', ->
-        SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
-        SysjView.get().setChildren(0)
-    else
-      SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
+
+      if (SysjView.get().getChildren() == 0)
+        console.log "entered here"
+        { spawn } = require 'child_process'
+        @sysjr = spawn("java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        SysjView.get().setChildren(1)
+        console.log "children are " + SysjView.get().getChildren()
+        @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
+        console.log process.pid
+        console.log @sysjr.pid
+        @sysjr.stderr.on 'data', ( data ) -> SysjView.get().getConsolePanel().error("#{data}")  #atom.notifications.addError "Run failed", detail: "#{data}"
+        # if the process spawned closes or exits
+        pid = @sysjr.pid
+        process.env['child_pid'] = pid
+        @sysjr.on 'close', ->
+          SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
+          SysjView.get().setChildren(0)
+        @sysjr.on 'exit', ->
+          SysjView.get().getConsolePanel().notice("sysj program has finished executing " + pid)#console.log "sysj program has finished executing." + process.id
+          SysjView.get().setChildren(0)
+      else
+        SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 
     ##{exec} = require('child_process')
     #exec(command , (err, stdout, stderr) ->
