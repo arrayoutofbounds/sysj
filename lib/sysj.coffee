@@ -67,6 +67,7 @@ module.exports = Sysj =
       @modalPanel.show()
 
   consumeCommandOutputView: (@commandOutputView) ->
+    console.log @commandOutputView
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
