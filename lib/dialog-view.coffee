@@ -157,7 +157,6 @@ module.exports =
       #  return false
       # e is the event.
       Sysj = require '..' + @path.sep + "lib" + @path.sep + 'sysj'
-      SysjView = require '..' + @path.sep + "lib" + @path.sep + 'sysj-view'
       Sysj.clickHappened = true
       id =  e.target.id;
 
@@ -170,8 +169,8 @@ module.exports =
       filePath = fileOpen?.path
 
       if filePath == undefined
-        window.alert("ctrl-alt-s compiles the current sysj file open. Please open a sysj file in the editor before proceeding.")
         Sysj.getModalPanel().destroy()
+        window.alert("ctrl-alt-s compiles the current sysj file open. Please open a sysj file in the editor before proceeding.")
       else
         dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))
         dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf(@path.sep + ""))

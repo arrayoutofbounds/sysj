@@ -1,5 +1,9 @@
 SysjView = require '../lib/sysj-view'
 {CompositeDisposable} = require 'atom'
+TermyView = require '../lib/term-view'
+{CompositeDisposable} = require 'atom'
+
+url = require('url')
 
 
 module.exports = Sysj =
@@ -9,6 +13,7 @@ module.exports = Sysj =
   dialogView: null
   flag: false
   clickHappened:false
+  termyMap: new Map()
 
   getModalPanel: ->
     @modalPanel
@@ -30,6 +35,24 @@ module.exports = Sysj =
 
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
 
+    atom.workspace.addOpener @opener.bind(@)
+
+
+  open: (location) ->
+    file = atom.workspace.getActivePaneItem()?.buffer?.file?.path
+    return atom.workspace.open('termy://' + file + '?location=' + location) if file
+
+  opener: (uri) ->
+    return unless uri.match(/^termy:/)
+
+    uri = url.parse(uri,true)
+
+    termy = @termyMap.get(uri.pathname) || new TermyView(uri.pathname)
+    @termyMap.set(uri.pathname, termy)
+
+    pane = if uri.query.location is "right" then atom.workspace.getActivePane().splitRight() else atom.workspace.getActivePane().splitDown()
+
+    termy.setPane(pane)
 
   showCompileDialog: ->
     path = require 'path'
@@ -37,11 +60,13 @@ module.exports = Sysj =
     console.log "show dialog method is run"
     DialogView = require '..' + path.sep + "lib" + path.sep + 'dialog-view'
     @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: false)
+    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
     @dialogView.toAppend = ""
 
     if !@modalPanel.isVisible()
       @modalPanel.show()
+
+  consumeCommandOutputView: (@commandOutputView) ->
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
@@ -52,6 +77,9 @@ module.exports = Sysj =
     @subscriptions.dispose()
     @subscriptions = null
     @sysjView.destroy()
+    @emitter.dispose()
+
+
 
   serialize: ->
     sysjViewState: @sysjView.serialize()
@@ -239,6 +267,10 @@ module.exports = Sysj =
           )
 
     doSomething(@organise,dir)
+
+    #@open('below')
+
+    console.log "command output view is " + @commandOutputView
 
     #@organise dir # this function will organise the files itn the project
 
