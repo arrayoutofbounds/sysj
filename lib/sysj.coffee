@@ -1,9 +1,5 @@
 SysjView = require '../lib/sysj-view'
 {CompositeDisposable} = require 'atom'
-TermyView = require '../lib/term-view'
-{CompositeDisposable} = require 'atom'
-
-url = require('url')
 
 
 module.exports = Sysj =
@@ -13,7 +9,6 @@ module.exports = Sysj =
   dialogView: null
   flag: false
   clickHappened:false
-  termyMap: new Map()
 
   getModalPanel: ->
     @modalPanel
@@ -35,24 +30,6 @@ module.exports = Sysj =
 
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
 
-    atom.workspace.addOpener @opener.bind(@)
-
-
-  open: (location) ->
-    file = atom.workspace.getActivePaneItem()?.buffer?.file?.path
-    return atom.workspace.open('termy://' + file + '?location=' + location) if file
-
-  opener: (uri) ->
-    return unless uri.match(/^termy:/)
-
-    uri = url.parse(uri,true)
-
-    termy = @termyMap.get(uri.pathname) || new TermyView(uri.pathname)
-    @termyMap.set(uri.pathname, termy)
-
-    pane = if uri.query.location is "right" then atom.workspace.getActivePane().splitRight() else atom.workspace.getActivePane().splitDown()
-
-    termy.setPane(pane)
 
   showCompileDialog: ->
     path = require 'path'
@@ -66,8 +43,11 @@ module.exports = Sysj =
     if !@modalPanel.isVisible()
       @modalPanel.show()
 
-  consumeCommandOutputView: (@commandOutputView) ->
+  consumeCommandOutputView: (commandOutputView) ->
+    @commandOutputView = commandOutputView
+    console.log "API consumed"
     console.log @commandOutputView
+    console.log "New terminal created"
 
   consumeConsolePanel: (consolePanel) ->
     @consolePanel = consolePanel
@@ -120,7 +100,7 @@ module.exports = Sysj =
   kill: ->
     # get the parent pid from the env and then kill it using sigterm
     terminate = require("terminate")
-    console.log process.env['parent']
+    #console.log process.env['parent']
 
     kill = require('tree-kill')
     kill process.env['child_pid'],'SIGKILL', (err) ->
@@ -269,9 +249,7 @@ module.exports = Sysj =
 
     doSomething(@organise,dir)
 
-    #@open('below')
-
-    console.log "command output view is " + @commandOutputView
+    #console.log "command output view is " + @commandOutputView
 
     #@organise dir # this function will organise the files itn the project
 
@@ -382,6 +360,10 @@ module.exports = Sysj =
 
     doSomething(@organise,dir)
 
+  createTerminal: ->
+    terminal = @commandOutputView.newTermClick() #create new terminal
+    terminal
+
   # run the currently open file..which is the xml file and get the output
   run: ->
     console.log "this process is " + process.pid
@@ -459,8 +441,11 @@ module.exports = Sysj =
 
       #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
       process.env['parent'] = process.pid
-      console.log " the id stored in process.env parent is " + process.env['parent']
-      console.log "children are " + SysjView.get().getChildren()
+      console.log " the id stored in process.env parent is " + process.env['parent'] #prints the parent process id
+      console.log "children are " + SysjView.get().getChildren() # gets the number of children processes
+
+      #terminal.spawn("ls -a -l","ls",['-a','-l'])
+      #terminal.destroy() # destory terminal created
 
       if (SysjView.get().getChildren() == 0)
         console.log "entered here"
@@ -484,6 +469,8 @@ module.exports = Sysj =
       else
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 
+      terminal = @createTerminal()
+      
     ##{exec} = require('child_process')
     #exec(command , (err, stdout, stderr) ->
     #   (
