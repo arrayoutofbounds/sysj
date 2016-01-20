@@ -78,11 +78,13 @@ module.exports = Sysj =
     fs.mkdir(directoryChosen +  path.sep + "config")
     fs.mkdir(directoryChosen + path.sep + "java")
     fs.mkdir(directoryChosen +  path.sep + "projectSettings")
-    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
-      if (err)
-        console.log "error occurred"
-      console.log "file saved"
-    )
+
+    # optional compile options file....can be used in the future 
+    #fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
+    #  if (err)
+    #    console.log "error occurred"
+    #  console.log "file saved"
+    #)
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
       if (err)
         console.log "error occurred"
@@ -416,6 +418,7 @@ module.exports = Sysj =
         @OSName="Linux"
         a = 0
 
+      # path to the class files
       @pathToClass = ""
       if (a)
         @pathToClass = ";" + dir + path.sep + "class" + path.sep
@@ -433,15 +436,15 @@ module.exports = Sysj =
       arrayLength = fileContentsArray.length
       counter = 0
       while counter < arrayLength
-        if a
+        if a # windows
           externalJars = externalJars + ";" + fileContentsArray[counter]
-        else
+        else # mac or linux
           externalJars = externalJars + ":" + fileContentsArray[counter]
         counter++
 
 
       #'-classpath','\"' + pathToJar + @pathToClass + '\"', 'com.systemj.SystemJRunner',filePath
-      process.env['parent'] = process.pid
+      process.env['parent'] = process.pid # this is the parent process id
       console.log " the id stored in process.env parent is " + process.env['parent'] #prints the parent process id
       console.log "children are " + SysjView.get().getChildren() # gets the number of children processes
 
@@ -470,8 +473,14 @@ module.exports = Sysj =
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 ###
 
+
+
+      console.log "java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
       terminal = @createTerminal()
-      terminal.spawn("java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+      if externalJars.length == 0
+        terminal.spawn("java -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+      else
+        terminal.spawn("java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
 
 
     ##{exec} = require('child_process')
