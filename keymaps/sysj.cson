@@ -10,4 +10,4 @@
 'atom-workspace':
   'ctrl-alt-s': 'sysj:compile'
   'ctrl-alt-a': 'sysj:run'
-  'ctrl-alt-k': 'sysj:kill'
+  #'ctrl-alt-k': 'sysj:kill'

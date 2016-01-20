@@ -23,9 +23,9 @@ module.exports = Sysj =
     @subscriptions.add atom.commands.add 'atom-workspace',
     'sysj:compile': => @showCompileDialog()
     'sysj:run': => @run()
-    'sysj:kill': => @kill()
     'sysj:create': => @create()
     'sysj:compile all': => @compileAll()
+    #'sysj:kill': => @kill()
     #'sysj:toggle': => @toggle()
 
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
@@ -97,6 +97,7 @@ module.exports = Sysj =
     #filePath = file?.path
     #console.log filePath
 
+  # this method was used when output went to the console. It is useless now
   kill: ->
     # get the parent pid from the env and then kill it using sigterm
     terminate = require("terminate")
@@ -444,13 +445,12 @@ module.exports = Sysj =
       console.log " the id stored in process.env parent is " + process.env['parent'] #prints the parent process id
       console.log "children are " + SysjView.get().getChildren() # gets the number of children processes
 
-      #terminal.spawn("ls -a -l","ls",['-a','-l'])
-      #terminal.destroy() # destory terminal created
 
-      if (SysjView.get().getChildren() == 0)
+      ###
+      if (SysjView.get().getChildren() == 0) # if the number of child processes is 0 then carry on and execute
         console.log "entered here"
         { spawn } = require 'child_process'
-        @sysjr = spawn("java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        #@sysjr = spawn("java",["-classpath", "" + pathToJar + externalJars + #@pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
         SysjView.get().setChildren(1)
         console.log "children are " + SysjView.get().getChildren()
         @sysjr.stdout.on 'data', (data ) ->  SysjView.get().getConsolePanel().log("#{data}",level="info")#SysjView.get().printOutput("#{data}")
@@ -468,9 +468,12 @@ module.exports = Sysj =
           SysjView.get().setChildren(0)
       else
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
+###
 
       terminal = @createTerminal()
-      
+      terminal.spawn("java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+
+
     ##{exec} = require('child_process')
     #exec(command , (err, stdout, stderr) ->
     #   (
