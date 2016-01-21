@@ -210,7 +210,6 @@ module.exports = Sysj =
     paths = atom.packages.getAvailablePackagePaths()
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
-    jdkPath = @getJdkPath(dir)
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
@@ -230,7 +229,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -310,8 +309,6 @@ module.exports = Sysj =
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + "")) # path to the overall project folder
     dirToSourceFolder = dir + path.sep + "source" # this ensures that it can get the root directory if any file is open
 
-    jdkPath = getJdkPath(dir)
-
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
     console.log "path to source folder is " + dirToSourceFolder
@@ -341,7 +338,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
