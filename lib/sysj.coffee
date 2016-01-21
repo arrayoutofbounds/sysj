@@ -79,13 +79,18 @@ module.exports = Sysj =
     fs.mkdir(directoryChosen + path.sep + "java")
     fs.mkdir(directoryChosen +  path.sep + "projectSettings")
 
-    # optional compile options file....can be used in the future 
+    # optional compile options file....can be used in the future
     #fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
     #  if (err)
     #    console.log "error occurred"
     #  console.log "file saved"
     #)
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
+      if (err)
+        console.log "error occurred"
+      console.log "file saved"
+    )
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToJdk.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
