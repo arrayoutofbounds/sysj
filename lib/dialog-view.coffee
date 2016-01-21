@@ -162,34 +162,34 @@ module.exports =
 
       console.log "count is " + @count
 
-      jsonfile = require('jsonfile')
+      #jsonfile = require('jsonfile') # require the jsonfile package
 
       editor = atom.workspace.getActivePaneItem()
       fileOpen = editor?.buffer.file
       filePath = fileOpen?.path
 
-      if filePath == undefined
+      if filePath == undefined # i.e if they have not opened any file
         Sysj.getModalPanel().destroy()
         window.alert("ctrl-alt-s compiles the current sysj file open. Please open a sysj file in the editor before proceeding.")
       else
         dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))
         dir = dirToSubFolder.substring(0,dirToSubFolder.lastIndexOf(@path.sep + ""))
 
-        file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
-        obj = {test:"workss"}
+        #file = dir + @path.sep + "projectSettings" + @path.sep + "compileOptions.json"
+        #obj = {test:"workss"}
 
-        jsonfile.writeFile(file, obj, {spaces: 2}, (err) ->
-          if err
-            console.error(err)
-        )
-        jsonfile.readFile(file, (err, obj) ->
-          console.log(obj)
-        )
+        #jsonfile.writeFile(file, obj, {spaces: 2}, (err) ->
+        #  if err
+        #    console.error(err)
+        #)
+        #jsonfile.readFile(file, (err, obj) ->
+        #  console.log(obj)
+        #)
 
         if id == 'btn1'
           i = 0
           while i < @count
-            inputs = document.getElementsByClassName(i + "")
+            inputs = document.getElementsByClassName(i + "") # get the inputs from the comppile option 
             j=0
             while j<2
               console.log "input j is " + inputs[j].value

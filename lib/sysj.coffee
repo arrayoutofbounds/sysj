@@ -90,7 +90,7 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
-    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToJdk.txt", "", (err) ->
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathToJdk.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
@@ -210,13 +210,14 @@ module.exports = Sysj =
     paths = atom.packages.getAvailablePackagePaths()
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
+    jdkPath = @getJdkPath(dir)
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
 
     process.chdir(dir) # change dir to the working directory so config-gen and other dir specific things work
 
-
+    # this finds the sysj package that atom has hidden
     findsysj = (p) ->
       (
         if (p.indexOf("sysj") > -1)
@@ -229,7 +230,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -309,6 +310,8 @@ module.exports = Sysj =
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + "")) # path to the overall project folder
     dirToSourceFolder = dir + path.sep + "source" # this ensures that it can get the root directory if any file is open
 
+    jdkPath = getJdkPath(dir)
+
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
     console.log "path to source folder is " + dirToSourceFolder
@@ -338,7 +341,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
+    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -372,6 +375,14 @@ module.exports = Sysj =
     terminal = @commandOutputView.newTermClick() #create new terminal
     terminal
 
+  getJdkPath: (dir) ->
+    fs  = require("fs")
+    path = require("path")
+    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathToJdk.txt").toString().split('\n'); # read and split by new line
+    pathToJdk = ""
+    pathToJdk = fileContentsArray[0]
+    pathToJdk # return path to jdk
+
   # run the currently open file..which is the xml file and get the output
   run: ->
     console.log "this process is " + process.pid
@@ -390,7 +401,7 @@ module.exports = Sysj =
     else
       dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
       dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf(path.sep + ""))
-      console.log "dir is " + dir
+      console.log "dir is " + dir # log the project directory
 
       packagePath = ""
       paths = atom.packages.getAvailablePackagePaths()
@@ -435,7 +446,7 @@ module.exports = Sysj =
       #console.log "command is " + command
 
       # READ path to external libraries and add each line to the class path
-      fs  = require("fs");
+      fs  = require("fs")
       fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
       externalJars = ""
       arrayLength = fileContentsArray.length
@@ -478,14 +489,14 @@ module.exports = Sysj =
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 ###
 
+      jdkPath = @getJdkPath(dir)
 
-
-      console.log "java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
+      console.log jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
       terminal = @createTerminal()
       if externalJars.length == 0
-        terminal.spawn("java -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        terminal.spawn(jdkPath + " -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath, jdkPath + "",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
       else
-        terminal.spawn("java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        terminal.spawn(jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath, jdkPath + "",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
 
 
     ##{exec} = require('child_process')
