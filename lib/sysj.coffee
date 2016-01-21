@@ -90,7 +90,7 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
-    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathToJdk.txt", "", (err) ->
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToJdk.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
@@ -216,7 +216,7 @@ module.exports = Sysj =
 
     process.chdir(dir) # change dir to the working directory so config-gen and other dir specific things work
 
-    # this finds the sysj package that atom has hidden
+
     findsysj = (p) ->
       (
         if (p.indexOf("sysj") > -1)
@@ -237,8 +237,6 @@ module.exports = Sysj =
     ## get sysjc with exec command
     #spawnSync = require('spawn-sync')
     #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
-
-    # store a function in the doSomething variable with arguments as a function organise and variable dir
     doSomething = (organise,dir) ->
 
       {exec} = require('child_process')
@@ -257,8 +255,7 @@ module.exports = Sysj =
               )
           )
 
-    doSomething(@organise,dir) # this will execture what is inside the doSomething function
-
+    doSomething(@organise,dir)
 
     #console.log "command output view is " + @commandOutputView
 
@@ -375,14 +372,6 @@ module.exports = Sysj =
     terminal = @commandOutputView.newTermClick() #create new terminal
     terminal
 
-  getJdkPath: (dir) ->
-    fs  = require("fs")
-    path = require("path")
-    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathToJdk.txt").toString().split('\n'); # read and split by new line
-    pathToJdk = ""
-    pathToJdk = fileContentsArray[0]
-    pathToJdk # return path to jdk
-
   # run the currently open file..which is the xml file and get the output
   run: ->
     console.log "this process is " + process.pid
@@ -401,7 +390,7 @@ module.exports = Sysj =
     else
       dirToConfigFolder = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
       dir = dirToConfigFolder.substring(0,dirToConfigFolder.lastIndexOf(path.sep + ""))
-      console.log "dir is " + dir # log the project directory
+      console.log "dir is " + dir
 
       packagePath = ""
       paths = atom.packages.getAvailablePackagePaths()
@@ -446,7 +435,7 @@ module.exports = Sysj =
       #console.log "command is " + command
 
       # READ path to external libraries and add each line to the class path
-      fs  = require("fs")
+      fs  = require("fs");
       fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
       externalJars = ""
       arrayLength = fileContentsArray.length
@@ -489,14 +478,14 @@ module.exports = Sysj =
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 ###
 
-      jdkPath = @getJdkPath(dir) # gets the path given from the file for the jdk 
 
-      console.log jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
+
+      console.log "java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
       terminal = @createTerminal()
       if externalJars.length == 0
-        terminal.spawn(jdkPath + " -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath, jdkPath + "",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        terminal.spawn("java -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
       else
-        terminal.spawn(jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath, jdkPath + "",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+        terminal.spawn("java -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
 
 
     ##{exec} = require('child_process')
