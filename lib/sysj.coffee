@@ -25,7 +25,6 @@ module.exports = Sysj =
     'sysj:run': => @run()
     'sysj:create': => @create()
     'sysj:compile all': => @compileAll()
-    'sysj:organise': => @organise()
     #'sysj:kill': => @kill()
     #'sysj:toggle': => @toggle()
 
@@ -129,20 +128,9 @@ module.exports = Sysj =
         console.log "children set to 0 so that sysj xml can be run again"
       return
       ###
-  organise: ->
+  organise: (dir) ->
     # this function organises the project as required
     path = require('path')
-
-    editor = atom.workspace.getActivePaneItem()
-    file = editor?.buffer.file
-    filePath = file?.path
-    console.log filePath
-
-    packagePath = ""
-    paths = atom.packages.getAvailablePackagePaths()
-    dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
-    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
-
     # move the java files from the class folder to a java folder
     classFolderPath = dir + path.sep + "class"
     javaFolderPath = dir + path.sep + "java"
@@ -163,12 +151,11 @@ module.exports = Sysj =
       fs.mkdir(javaFolderPath)
 
     files = fs.readdirSync classFolderPath # sync read to ensure that all files are collected in an array before moving on
-    console.log files # print all the files
+    console.log files
     i = 0
     mv = require("mv")
     while i < files.length
       #console.log files[i]
-      console.log "moving files"
       if (files[i].indexOf(".xml") > -1)
         mv classFolderPath + path.sep + files[i], configFolderPath + path.sep + files[i], (err) ->
           if err
@@ -224,8 +211,6 @@ module.exports = Sysj =
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
 
-    jdkPath = @getJdkPath(dir)
-
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
 
@@ -244,7 +229,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -254,31 +239,25 @@ module.exports = Sysj =
     #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
 
     # store a function in the doSomething variable with arguments as a function organise and variable dir
+    doSomething = (organise,dir) ->
 
-    #doSomething = (commandOutputView,organise,dir) ->
-    terminal = @commandOutputView.newTermClick()
-    value = terminal.spawn(jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath,jdkPath + "", ["-classpath", "" + pathToJar , 'JavaPrettyPrinter',"-d", "" + dir + path.sep + 'class', ""+toAppend, "" + filePath])
-    #@organise dir
-      # when it executes this if its successful it will call the organise directory with dir else it will show the output
-      ##{exec} = require('child_process')
+      {exec} = require('child_process')
+      exec(command, (err, stdout, stderr) ->
+          (
+           if (stderr)
+              #console.log("child processes failed with error code: " + err.code)
+              atom.notifications.addError "Compilation failed", detail: stderr
+              SysjView.get().getConsolePanel().warn(stderr)
+            else
+              atom.notifications.addSuccess "Compilation successful", detail: stdout
+              SysjView.get().getConsolePanel().log(stdout,level="info")
+              organise dir
+              #console.log(stdout)
+              #atom.notifications.addInfo "err is ", detail: err
+              )
+          )
 
-      #exec(command, (err, stdout, stderr) ->
-      #    (
-      #     if (stderr)
-      #        #console.log("child processes failed with error code: " + err.code)
-      #        atom.notifications.addError "Compilation failed", detail: stderr
-      #        SysjView.get().getConsolePanel().warn(stderr)
-      #      else
-      #        atom.notifications.addSuccess "Compilation successful", detail: stdout
-      #        SysjView.get().getConsolePanel().log(stdout,level="info")
-      #        organise dir
-      #        #console.log(stdout)
-      #        #atom.notifications.addInfo "err is ", detail: err
-      #        )
-      #    )
-
-
-    #doSomething(@commandOutputView,@organise,dir) # this will execture what is inside the doSomething function
+    doSomething(@organise,dir) # this will execture what is inside the doSomething function
 
 
     #console.log "command output view is " + @commandOutputView
@@ -510,7 +489,7 @@ module.exports = Sysj =
         SysjView.get().getConsolePanel().log("there is already one child and wait till it finishes",level="info")#console.log "there is already one child and wait till it finishes"
 ###
 
-      jdkPath = @getJdkPath(dir)
+      jdkPath = @getJdkPath(dir) # gets the path given from the file for the jdk 
 
       console.log jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
       terminal = @createTerminal()
