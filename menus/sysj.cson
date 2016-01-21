@@ -21,6 +21,10 @@
         {
             'label': 'Compile all'
             'command': 'sysj:compile all'
+        },
+        {
+            'label': 'Organise'
+            'command': 'sysj:organise'
         }
       ]
     ]
