@@ -2,7 +2,7 @@
 
 Package which helps compile and run SystemJ programs. It works Windows, OSX and linux.
 
-### How to user
+### How to use
 
 1. Download atom
 2. Go to settings/preferences
@@ -25,7 +25,7 @@ Package which helps compile and run SystemJ programs. It works Windows, OSX and 
   to work.
 
 - terminal-panel-uoa (author: arrayoutofbounds) -  This is a terminal that needs to be activated before a subsystem is run. Go and click
-  on "activate terminal panel" before trying to run the xml files that have a subsystem each. 
+  on "activate terminal panel" before trying to run the xml files that have a subsystem each.
 
 ### Documentation and tutorials
 
