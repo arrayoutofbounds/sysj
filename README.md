@@ -21,8 +21,11 @@ Package which helps compile and run SystemJ programs. It works Windows, OSX and 
 
 ### Dependencies (atom packages that also need to be download)
 
-- Console Panel (author: spark)
-- terminal-panel-uoa (author: arrayoutofbounds)
+- Console Panel (author: spark) - This is a console that outputs the results from the compilation. It is needed for the compilation to
+  to work.
+
+- terminal-panel-uoa (author: arrayoutofbounds) -  This is a terminal that needs to be activated before a subsystem is run. Go and click
+  on "activate terminal panel" before trying to run the xml files that have a subsystem each. 
 
 ### Documentation and tutorials
 
