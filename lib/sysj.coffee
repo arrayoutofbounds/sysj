@@ -65,6 +65,7 @@ module.exports = Sysj =
   serialize: ->
     sysjViewState: @sysjView.serialize()
 
+
   create: ->
     fs = require('fs')
     remote = require 'remote'
@@ -90,7 +91,7 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
-    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToJdk.txt", "", (err) ->
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathToJdk.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
@@ -172,6 +173,8 @@ module.exports = Sysj =
     return
 
 
+
+
   ## compile the current file and then get the output
   compile: (toAppend) ->
     console.log "this process is " + process.pid
@@ -210,6 +213,7 @@ module.exports = Sysj =
     paths = atom.packages.getAvailablePackagePaths()
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
+    jdkPath = @getJdkPath(dir)
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
@@ -229,7 +233,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -371,6 +375,14 @@ module.exports = Sysj =
   createTerminal: ->
     terminal = @commandOutputView.newTermClick() #create new terminal
     terminal
+
+  getJdkPath: (dir) ->
+    fs  = require("fs")
+    path = require("path")
+    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathToJdk.txt").toString().split('\n'); # read and split by new line
+    pathToJdk = ""
+    pathToJdk = fileContentsArray[0]
+    pathToJdk # return path to jdk
 
   # run the currently open file..which is the xml file and get the output
   run: ->
