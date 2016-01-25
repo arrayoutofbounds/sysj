@@ -315,6 +315,10 @@ module.exports = Sysj =
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + "")) # path to the sub folder folder
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + "")) # path to the overall project folder
     dirToSourceFolder = dir + path.sep + "source" # this ensures that it can get the root directory if any file is open
+    jdkPath = @getJdkPath(dir)
+
+    if jdkPath.length == 0
+      jdkPath = "java"
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
@@ -345,7 +349,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = 'java -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
+    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
