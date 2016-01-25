@@ -1,5 +1,7 @@
 # sysj package
 
-Package which helps compile and run SystemJ programs.
+Package which helps compile and run SystemJ programs. It works Windows, OSX and linux.
 
-![A screenshot of your package](http://i.imgur.com/6hCHojp.png)
+Documentation and tutorials will be uploaded soon.
+
+![A screenshot of your package](http://i.imgur.com/NMCKks0.png)
