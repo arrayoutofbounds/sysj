@@ -189,7 +189,7 @@ module.exports =
         if id == 'btn1'
           i = 0
           while i < @count
-            inputs = document.getElementsByClassName(i + "") # get the inputs from the comppile option 
+            inputs = document.getElementsByClassName(i + "") # get the inputs from the comppile option
             j=0
             while j<2
               console.log "input j is " + inputs[j].value
@@ -206,14 +206,17 @@ module.exports =
           #return "compile"
           Sysj.getModalPanel().destroy()
           Sysj.compile(@toAppend)
+          Sysj.setCompileDialogExistence(false)  # set the existence of the dialog to false as it is destroyed and can be created again.
           console.log "compile"
         else if id == 'btn2'
           Sysj.getModalPanel().destroy()
           console.log "closed compile dialog"
+          Sysj.setCompileDialogExistence(false) # set the existence of the dialog to false as it is destroyed and can be created again.
           #return "close"
           # close the modal
         else
           Sysj.getModalPanel().destroy()
+          Sysj.setCompileDialogExistence(false)  # set the existence of the dialog to false as it is destroyed and can be created again.
           console.log "we have a problem and id is " + id
 
 

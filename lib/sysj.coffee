@@ -9,6 +9,10 @@ module.exports = Sysj =
   dialogView: null
   flag: false
   clickHappened:false
+  compileDialog: false
+
+  setCompileDialogExistence: (value) -> # sets the existence of the compile dialog so when it is asked to be showed it can be referred
+    @compileDialog = value
 
   getModalPanel: ->
     @modalPanel
@@ -31,17 +35,18 @@ module.exports = Sysj =
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
 
 
-  showCompileDialog: ->
-    path = require 'path'
-    #console.log path.sep #checks that the path is different for windows and linux
-    console.log "show dialog method is run"
-    DialogView = require '..' + path.sep + "lib" + path.sep + 'dialog-view'
-    @dialogView = new DialogView()
-    @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
-    @dialogView.toAppend = ""
-
-    if !@modalPanel.isVisible()
-      @modalPanel.show()
+  showCompileDialog: -> # this shows the compile dialog if the compile dialog variable is false, else it does nothing because the dialog must be open
+    if @compileDialog == false # the compile dialog must not exist for this to happen. else it implies that the dialog is already open
+      path = require 'path'
+      #console.log path.sep #checks that the path is different for windows and linux
+      console.log "show dialog method is run"
+      DialogView = require '..' + path.sep + "lib" + path.sep + 'dialog-view'
+      @dialogView = new DialogView()
+      @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
+      @dialogView.toAppend = ""
+      @compileDialog = true # set it to true as it exists 
+      if !@modalPanel.isVisible()
+        @modalPanel.show()
 
   consumeCommandOutputView: (commandOutputView) ->
     @commandOutputView = commandOutputView
