@@ -215,6 +215,9 @@ module.exports = Sysj =
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
     jdkPath = @getJdkPath(dir)
 
+    if jdkPath.length == 0
+      jdkPath = "java"
+
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
 
