@@ -44,7 +44,7 @@ module.exports = Sysj =
       @dialogView = new DialogView()
       @modalPanel = atom.workspace.addRightPanel(item: @dialogView.getElement(), visible: true)
       @dialogView.toAppend = ""
-      @compileDialog = true # set it to true as it exists 
+      @compileDialog = true # set it to true as it exists
       if !@modalPanel.isVisible()
         @modalPanel.show()
 
@@ -84,6 +84,8 @@ module.exports = Sysj =
     fs.mkdir(directoryChosen +  path.sep + "config")
     fs.mkdir(directoryChosen + path.sep + "java")
     fs.mkdir(directoryChosen +  path.sep + "projectSettings")
+    fs.mkdir(directoryChosen +  path.sep + "java_source" + path.sep + "java")
+    fs.mkdir(directoryChosen +  path.sep + "java_source" + path.sep + "class")
 
     # optional compile options file....can be used in the future
     #fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
@@ -241,7 +243,7 @@ module.exports = Sysj =
     console.log pathToJar
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = jdkPath + ' -classpath \"' + pathToJar  +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
