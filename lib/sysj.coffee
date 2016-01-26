@@ -167,6 +167,17 @@ module.exports = Sysj =
     while j < filesInJavaFolder.length
       if (filesInJavaFolder[j].indexOf(".java") == -1)
         fs.mkdir(dir +  path.sep + "class" + path.sep + filesInJavaFolder[j]) # dir/class/mytest
+        # now move all the class files from the folder that are inside the java folder
+        console.log filesInJavaFolder[j]
+        filesInSubJavaFolder = fs.readdirSync javaFolderPath + path.sep + filesInJavaFolder[j] # this gets all the class files in that sub folder inside java
+        console.log "files in sub folder are " + filesInSubJavaFolder
+        k = 0
+        while k<filesInSubJavaFolder.length
+          if ( filesInSubJavaFolder[k].indexOf(".class") > -1)
+            mv dir + path.sep + "java" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k],dir + path.sep + "class" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k], (err) ->
+              if err
+                console.error err
+          k++
       j++
 
     files = fs.readdirSync classFolderPath # sync read to ensure that all files are collected in an array before moving on
@@ -187,27 +198,7 @@ module.exports = Sysj =
             console.error err
           return
       i++
-    #return
-
-    h = 0
-    filesInJavaFolder = fs.readdirSync javaFolderPath
-    while h < filesInJavaFolder.length
-      if (filesInJavaFolder[h].indexOf(".java") == -1)
-        # now move all the class files from the folder that are inside the java folder
-        console.log filesInJavaFolder[h]
-        filesInSubJavaFolder = fs.readdirSync javaFolderPath + path.sep + filesInJavaFolder[h] # this gets all the class files in that sub folder inside java
-        console.log "files in sub folder are " + filesInSubJavaFolder
-        k = 0
-        while k<filesInSubJavaFolder.length
-          if ( filesInSubJavaFolder[k].indexOf(".class") > -1)
-            mv dir + path.sep + "java" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k],dir + path.sep + "class" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k], (err) ->
-              if err
-                console.error err
-          k++
-      h++
-
-
-
+    return
 
 
   ## compile the current file and then get the output
