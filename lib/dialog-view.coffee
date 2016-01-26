@@ -170,6 +170,7 @@ module.exports =
 
       if filePath == undefined # i.e if they have not opened any file
         Sysj.getModalPanel().destroy()
+        Sysj.setCompileDialogExistence(false)
         window.alert("ctrl-alt-s compiles the current sysj file open. Please open a sysj file in the editor before proceeding.")
       else
         dirToSubFolder = filePath.substring(0,filePath.lastIndexOf(@path.sep + ""))

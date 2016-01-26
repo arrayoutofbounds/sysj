@@ -84,8 +84,7 @@ module.exports = Sysj =
     fs.mkdir(directoryChosen +  path.sep + "config")
     fs.mkdir(directoryChosen + path.sep + "java")
     fs.mkdir(directoryChosen +  path.sep + "projectSettings")
-    fs.mkdir(directoryChosen +  path.sep + "java_source" + path.sep + "java")
-    fs.mkdir(directoryChosen +  path.sep + "java_source" + path.sep + "class")
+
 
     # optional compile options file....can be used in the future
     #fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "compileOptions.json", "{}", (err) ->
@@ -158,10 +157,21 @@ module.exports = Sysj =
     if !dirExists(javaFolderPath)
       fs.mkdir(javaFolderPath)
 
+    filesInJavaFolder = fs.readdirSync javaFolderPath
+    console.log filesInJavaFolder # this lists all the files and folders inside the java folder
+
+    mv = require("mv")
+
+    # go through the java folder and make a folder for each name that is not a .java file
+    j = 0
+    while j < filesInJavaFolder.length
+      if (filesInJavaFolder[j].indexOf(".java") == -1)
+        fs.mkdir(dir +  path.sep + "class" + path.sep + filesInJavaFolder[j]) # dir/class/mytest
+      j++
+
     files = fs.readdirSync classFolderPath # sync read to ensure that all files are collected in an array before moving on
     console.log files
     i = 0
-    mv = require("mv")
     while i < files.length
       #console.log files[i]
       if (files[i].indexOf(".xml") > -1)
@@ -177,7 +187,25 @@ module.exports = Sysj =
             console.error err
           return
       i++
-    return
+    #return
+
+    h = 0
+    filesInJavaFolder = fs.readdirSync javaFolderPath
+    while h < filesInJavaFolder.length
+      if (filesInJavaFolder[h].indexOf(".java") == -1)
+        # now move all the class files from the folder that are inside the java folder
+        console.log filesInJavaFolder[h]
+        filesInSubJavaFolder = fs.readdirSync javaFolderPath + path.sep + filesInJavaFolder[h] # this gets all the class files in that sub folder inside java
+        console.log "files in sub folder are " + filesInSubJavaFolder
+        k = 0
+        while k<filesInSubJavaFolder.length
+          if ( filesInSubJavaFolder[k].indexOf(".class") > -1)
+            mv dir + path.sep + "java" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k],dir + path.sep + "class" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k], (err) ->
+              if err
+                console.error err
+          k++
+      h++
+
 
 
 
@@ -242,8 +270,37 @@ module.exports = Sysj =
     pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
     console.log pathToJar
 
+    # a represents Windows
+    # rest represent unix or linux
+    a = 1
+    @OSName = ""
+    if (navigator.appVersion.indexOf("Win")!=-1)
+      @OSName="Windows"
+      a = 1
+    if (navigator.appVersion.indexOf("Mac")!=-1)
+      @OSName="MacOS"
+      a = 0
+    if (navigator.appVersion.indexOf("X11")!=-1)
+      @OSName="UNIX"
+      a = 0
+    if (navigator.appVersion.indexOf("Linux")!=-1)
+      @OSName="Linux"
+      a = 0
+
+    fs  = require("fs");
+    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
+    externalJars = ""
+    arrayLength = fileContentsArray.length
+    counter = 0
+    while counter < arrayLength
+      if a # windows
+        externalJars = externalJars + ";" + fileContentsArray[counter]
+      else # mac or linux
+        externalJars = externalJars + ":" + fileContentsArray[counter]
+      counter++
+
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar  +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+    command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
