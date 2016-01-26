@@ -235,89 +235,94 @@ module.exports = Sysj =
     filePath = file?.path
     console.log filePath
 
-    packagePath = ""
-    paths = atom.packages.getAvailablePackagePaths()
-    dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
-    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
-    jdkPath = @getJdkPath(dir)
-
-    if jdkPath.length == 0
-      jdkPath = "java"
-
-    console.log "dirToConfig is " + dirToConfig
-    console.log "dir is " + dir
-
-    process.chdir(dir) # change dir to the working directory so config-gen and other dir specific things work
+    if filePath.indexOf(".sysj") > -1
 
 
-    findsysj = (p) ->
-      (
-        if (p.indexOf("sysj") > -1)
-          packagePath = packagePath + p
-          console.log packagePath
-      )
-    findsysj p for p in paths
+      packagePath = ""
+      paths = atom.packages.getAvailablePackagePaths()
+      dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
+      dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
+      jdkPath = @getJdkPath(dir)
 
-    pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
-    console.log pathToJar
+      if jdkPath.length == 0
+        jdkPath = "java"
 
-    # a represents Windows
-    # rest represent unix or linux
-    a = 1
-    @OSName = ""
-    if (navigator.appVersion.indexOf("Win")!=-1)
-      @OSName="Windows"
+      console.log "dirToConfig is " + dirToConfig
+      console.log "dir is " + dir
+
+      process.chdir(dir) # change dir to the working directory so config-gen and other dir specific things work
+
+
+      findsysj = (p) ->
+        (
+          if (p.indexOf("sysj") > -1)
+            packagePath = packagePath + p
+            console.log packagePath
+        )
+      findsysj p for p in paths
+
+      pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
+      console.log pathToJar
+
+      # a represents Windows
+      # rest represent unix or linux
       a = 1
-    if (navigator.appVersion.indexOf("Mac")!=-1)
-      @OSName="MacOS"
-      a = 0
-    if (navigator.appVersion.indexOf("X11")!=-1)
-      @OSName="UNIX"
-      a = 0
-    if (navigator.appVersion.indexOf("Linux")!=-1)
-      @OSName="Linux"
-      a = 0
+      @OSName = ""
+      if (navigator.appVersion.indexOf("Win")!=-1)
+        @OSName="Windows"
+        a = 1
+      if (navigator.appVersion.indexOf("Mac")!=-1)
+        @OSName="MacOS"
+        a = 0
+      if (navigator.appVersion.indexOf("X11")!=-1)
+        @OSName="UNIX"
+        a = 0
+      if (navigator.appVersion.indexOf("Linux")!=-1)
+        @OSName="Linux"
+        a = 0
 
-    fs  = require("fs");
-    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
-    externalJars = ""
-    arrayLength = fileContentsArray.length
-    counter = 0
-    while counter < arrayLength
-      if a # windows
-        externalJars = externalJars + ";" + fileContentsArray[counter]
-      else # mac or linux
-        externalJars = externalJars + ":" + fileContentsArray[counter]
-      counter++
+      fs  = require("fs");
+      fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
+      externalJars = ""
+      arrayLength = fileContentsArray.length
+      counter = 0
+      while counter < arrayLength
+        if a # windows
+          externalJars = externalJars + ";" + fileContentsArray[counter]
+        else # mac or linux
+          externalJars = externalJars + ":" + fileContentsArray[counter]
+        counter++
 
-    # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+      # this moves the class and java compiled files to the class folder
+      command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
 
-    #exec = require('sync-exec')
-    #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
-    console.log command
-    ## get sysjc with exec command
-    #spawnSync = require('spawn-sync')
-    #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
-    doSomething = (organise,dir) ->
+      #exec = require('sync-exec')
+      #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
+      console.log command
+      ## get sysjc with exec command
+      #spawnSync = require('spawn-sync')
+      #result = spawnSync('java',['-classpath',"" + pathToJar,'JavaPrettyPrinter','-d',""+dir,'/class',""+filePath,"1>" + console.log ,"2>" + console.log ])
+      doSomething = (organise,dir) ->
 
-      {exec} = require('child_process')
-      exec(command, (err, stdout, stderr) ->
-          (
-           if (stderr)
-              #console.log("child processes failed with error code: " + err.code)
-              atom.notifications.addError "Compilation failed", detail: stderr
-              SysjView.get().getConsolePanel().warn(stderr)
-            else
-              atom.notifications.addSuccess "Compilation successful", detail: stdout
-              SysjView.get().getConsolePanel().log(stdout,level="info")
-              organise dir
-              #console.log(stdout)
-              #atom.notifications.addInfo "err is ", detail: err
-              )
-          )
+        {exec} = require('child_process')
+        exec(command, (err, stdout, stderr) ->
+            (
+             if (stderr)
+                #console.log("child processes failed with error code: " + err.code)
+                atom.notifications.addError "Compilation failed", detail: stderr
+                SysjView.get().getConsolePanel().warn(stderr)
+              else
+                atom.notifications.addSuccess "Compilation successful", detail: stdout
+                SysjView.get().getConsolePanel().log(stdout,level="info")
+                organise dir
+                #console.log(stdout)
+                #atom.notifications.addInfo "err is ", detail: err
+                )
+            )
 
-    doSomething(@organise,dir)
+      doSomething(@organise,dir)
+    else
+      window.alert("Please compile a sysj file only")
 
     #console.log "command output view is " + @commandOutputView
 
