@@ -325,7 +325,7 @@ module.exports = Sysj =
     # go through the java folder and make a folder for each name that is not a .java file
     j = 0
     while j < filesInJavaFolder.length
-      if (filesInJavaFolder[j].indexOf(".java") == -1)
+      if (filesInJavaFolder[j].indexOf(".java") == -1) # if file is not java then it must be a folder so make a dir in class folder of that name
         fs.mkdir(dir +  path.sep + "class" + path.sep + filesInJavaFolder[j]) # dir/class/mytest
         # now move all the class files from the folder that are inside the java folder
         console.log filesInJavaFolder[j]
@@ -334,7 +334,7 @@ module.exports = Sysj =
         k = 0
         while k<filesInSubJavaFolder.length
           if ( filesInSubJavaFolder[k].indexOf(".class") > -1)
-            mv dir + path.sep + "java" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k],dir + path.sep + "class" + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k], (err) ->
+            mv javaFolderPath + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k],classFolderPath + path.sep + filesInJavaFolder[j] + path.sep + filesInSubJavaFolder[k], (err) ->
               if err
                 console.error err
           k++
