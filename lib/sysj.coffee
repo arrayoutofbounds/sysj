@@ -248,6 +248,10 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
+    jsonfile.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "generate_subsystem.json", {}, {spaces: 2}, (err) ->
+    if err
+      console.error(err)
+    )
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
       if (err)
         console.log "error occurred"
