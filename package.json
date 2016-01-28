@@ -17,10 +17,7 @@
     "jsonfile": "2.2.3",
     "tree-kill": "1.0.0",
     "json-file": "0.1.0",
-    "js2xmlparser": "1.0.0",
-    "xmlbuilder": "4.2.1",
-    "xml-writer": "1.6.0",
-    "libxmljs": "0.17.0"
+    "xmlbuilder": "4.2.1"
   },
   "consumedServices": {
     "console-panel": {

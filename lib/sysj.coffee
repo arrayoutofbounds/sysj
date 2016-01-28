@@ -63,11 +63,6 @@ module.exports = Sysj =
     System.com('</Interconnection>')
     SubSystem = System.ele("SubSystem",{'Name':subsystem.toString(),'Local':'true'})
 
-    # use libxml and construct a xml
-    #libxml = require("libxmljs")
-    #doc = new (libxml.Document) # this starts a new xml document to create
-    #a = doc.node('System').attr({xmlns:'http://systemjtechnology.com'})
-    #b = a.node('SubSystem').attr({Name: '' + subsystem,Local:'true'})
 
     # now go throught the SubSystem and get all clock domains
     for cd of val
@@ -78,7 +73,7 @@ module.exports = Sysj =
 
         # create the clock domain tag
         ClockDomain = SubSystem.ele('ClockDomain',{'Name':cd.toString(),'Class': (val[cd].Class).toString()}) # this adds clock domains as siblings but also children of SubSystem
-        #cdNode = b.node('ClockDomain').attr({Name:''+cd,Class:val[cd].Class + ''})
+
 
         # now go through and add channels
         if val[cd].oChannels != undefined
@@ -107,7 +102,6 @@ module.exports = Sysj =
               ocProperty = atr
               attributesOc[ocProperty] = oc[atr]
           #console.log attributesOc
-          #cdNode.node('oChannel').attr(attributesOc)
           @addNode(ClockDomain,'oChannel',attributesOc)
 
         for ic in iChannels # if nothing is in ochannel array then its ok as nothing happens
@@ -119,9 +113,7 @@ module.exports = Sysj =
               icProperty = atr
               attributesIc[icProperty] = ic[atr]
           #console.log attributesIc
-          #cdNode.node('oChannel').attr(attributesIc)
           @addNode(ClockDomain,'iChannel',attributesIc)
-          #cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
 
         for inputSignal in iSignals
           console.log inputSignal
@@ -156,7 +148,6 @@ module.exports = Sysj =
     # node is the node you want to add to
     # type is channel or signal existence
     # attributes is a object in the form e.g {Name:'' + ic.Name,From:'' + ic.From}
-    #cnode.node(type.toString()).attr(attributes)
 
   readJson: (pathToJsonFile)  ->
     jsonfile = require('jsonfile')
