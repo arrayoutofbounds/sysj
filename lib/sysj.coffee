@@ -83,20 +83,40 @@ module.exports = Sysj =
 
         for oc in oChannels # if nothing is in ochannel array then its ok as nothing happens
           console.log oc
-          cdNode.node('oChannel').attr({Name:'' + oc.Name,To:'' + oc.To})
+          # go through all properties of that oc.
+          attributesOc = {}
+          for atr of oc
+            if oc.hasOwnProperty(atr)
+              ocProperty = atr
+              attributesOc[ocProperty] = oc[atr]
+          #console.log attributesOc
+          #cdNode.node('oChannel').attr(attributesOc)
+          @addNode(cdNode,'oChannel',attributesOc)
 
         for ic in iChannels # if nothing is in ochannel array then its ok as nothing happens
           console.log ic
-          cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
+
+          attributesIc = {}
+          for atr of ic
+            if ic.hasOwnProperty(atr)
+              icProperty = atr
+              attributesIc[icProperty] = ic[atr]
+          #console.log attributesIc
+          #cdNode.node('oChannel').attr(attributesIc)
+          @addNode(cdNode,'iChannel',attributesIc)
+          #cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
 
 
         #console.log val[cd].oChannels # this prints all the output channels
-
-
     console.log clockDomains # prints all the clock domains in the sub system
-
     fs.writeFileSync(pathToXml,doc.toString())
 
+  addNode: (cnode,type,attributes)->
+
+    # node is the node you want to add to
+    # type is channel or signal existence
+    # attributes is a object in the form e.g {Name:'' + ic.Name,From:'' + ic.From}
+    cnode.node(type.toString()).attr(attributes)
 
   readJson: (pathToJsonFile)  ->
     jsonfile = require('jsonfile')
