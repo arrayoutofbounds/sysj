@@ -48,24 +48,26 @@ module.exports = Sysj =
     oChannels = []
     iChannels = []
     pathToXml = dir + path.sep + "config" + path.sep + subsystem + ".xml" #create the xml file
-    ###builder = require('xmlbuilder')
-    xml = builder.create(
-      {
-        System: {
-          '@xmlns':'http://systemjtechnology.com',
-          '#text': 'adad'
-        }
-      }
-    )
-    ###
-    #fs.appendFileSync(pathToXml,xml)
+    builder = require('xmlbuilder')
+
+
+    System = builder.create("System")
+    System.att('xmlns','http://systemjtechnology.com') # add attribute to the root element
+    System.com('<Interconnection>')
+    System.com('<Link Type="Destination">')
+    System.com('Interface example:')
+    System.com('<Interface SubSystem="SS1" Class="com.systemj.ipc.TCPIPInterface" Args="127.0.0.1:1100"/>')
+    System.com('<Interface SubSystem="SS2" Class="com.systemj.ipc.TCPIPInterface" Args="127.0.0.1:1200"/>')
+    System.com('.....')
+    System.com('</Link>')
+    System.com('</Interconnection>')
+    SubSystem = System.ele("SubSystem",{'Name':subsystem.toString(),'Local':'true'})
 
     # use libxml and construct a xml
-    libxml = require("libxmljs")
-    doc = new (libxml.Document) # this starts a new xml document to create
-    a = doc.node('System').attr({xmlns:'http://systemjtechnology.com'})
-    b = a.node('SubSystem').attr({Name: '' + subsystem,Local:'true'})
-    #a = a.node('random') # this added to the root node and is a sibling of b
+    #libxml = require("libxmljs")
+    #doc = new (libxml.Document) # this starts a new xml document to create
+    #a = doc.node('System').attr({xmlns:'http://systemjtechnology.com'})
+    #b = a.node('SubSystem').attr({Name: '' + subsystem,Local:'true'})
 
     # now go throught the SubSystem and get all clock domains
     for cd of val
@@ -73,7 +75,10 @@ module.exports = Sysj =
         console.log cd # this just prints the name of the clock domain inside
         clockDomains.push cd
         #console.log val[cd]
-        cdNode = b.node('ClockDomain').attr({Name:''+cd,Class:val[cd].Class + ''}) # this adds clock domains as siblings but also children of SubSystem
+
+        # create the clock domain tag
+        ClockDomain = SubSystem.ele('ClockDomain',{'Name':cd.toString(),'Class': (val[cd].Class).toString()}) # this adds clock domains as siblings but also children of SubSystem
+        #cdNode = b.node('ClockDomain').attr({Name:''+cd,Class:val[cd].Class + ''})
 
         # now go through and add channels
         if val[cd].oChannels != undefined
@@ -89,9 +94,9 @@ module.exports = Sysj =
             if oc.hasOwnProperty(atr)
               ocProperty = atr
               attributesOc[ocProperty] = oc[atr]
-          #console.log attributesOc
+          console.log attributesOc
           #cdNode.node('oChannel').attr(attributesOc)
-          @addNode(cdNode,'oChannel',attributesOc)
+          @addNode(ClockDomain,'oChannel',attributesOc)
 
         for ic in iChannels # if nothing is in ochannel array then its ok as nothing happens
           console.log ic
@@ -103,20 +108,25 @@ module.exports = Sysj =
               attributesIc[icProperty] = ic[atr]
           #console.log attributesIc
           #cdNode.node('oChannel').attr(attributesIc)
-          @addNode(cdNode,'iChannel',attributesIc)
+          @addNode(ClockDomain,'iChannel',attributesIc)
           #cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
 
 
         #console.log val[cd].oChannels # this prints all the output channels
     console.log clockDomains # prints all the clock domains in the sub system
-    fs.writeFileSync(pathToXml,doc.toString())
+    #fs.writeFileSync(pathToXml,doc.toString())
 
-  addNode: (cnode,type,attributes)->
 
+    # convert to string and then write to the xml file
+    converted = System.end({ pretty: true, indent: '  ', newline: '\n' })
+    fs.writeFileSync(pathToXml,converted)
+
+  addNode: (ClockDomain,type,attributes) ->
+    ClockDomain.ele(type.toString(),attributes)
     # node is the node you want to add to
     # type is channel or signal existence
     # attributes is a object in the form e.g {Name:'' + ic.Name,From:'' + ic.From}
-    cnode.node(type.toString()).attr(attributes)
+    #cnode.node(type.toString()).attr(attributes)
 
   readJson: (pathToJsonFile)  ->
     jsonfile = require('jsonfile')
