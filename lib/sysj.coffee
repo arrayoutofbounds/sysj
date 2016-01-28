@@ -83,8 +83,20 @@ module.exports = Sysj =
         # now go through and add channels
         if val[cd].oChannels != undefined
           oChannels = val[cd].oChannels
+        else
+            oChannels = []
         if val[cd].iChannels != undefined
           iChannels = val[cd].iChannels
+        else
+          iChannels = []
+        if val[cd].iSignals != undefined
+          iSignals = val[cd].iSignals
+        else
+          iSignals  = []
+        if val[cd].oSignals != undefined
+          oSignals = val[cd].oSignals
+        else
+          oSignals  = []
 
         for oc in oChannels # if nothing is in ochannel array then its ok as nothing happens
           console.log oc
@@ -94,7 +106,7 @@ module.exports = Sysj =
             if oc.hasOwnProperty(atr)
               ocProperty = atr
               attributesOc[ocProperty] = oc[atr]
-          console.log attributesOc
+          #console.log attributesOc
           #cdNode.node('oChannel').attr(attributesOc)
           @addNode(ClockDomain,'oChannel',attributesOc)
 
@@ -110,6 +122,24 @@ module.exports = Sysj =
           #cdNode.node('oChannel').attr(attributesIc)
           @addNode(ClockDomain,'iChannel',attributesIc)
           #cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
+
+        for inputSignal in iSignals
+          console.log inputSignal
+          attributesIsig = {}
+          for atr of inputSignal
+            if inputSignal.hasOwnProperty(atr)
+              isigProperty = atr
+              attributesIsig[isigProperty] = inputSignal[atr]
+          @addNode(ClockDomain,'iSignal',attributesIsig)
+
+        for outputSignal in oSignals
+          console.log outputSignal
+          attributesOsig = {}
+          for atr of outputSignal
+            if outputSignal.hasOwnProperty(atr)
+              osigProperty = atr
+              attributesOsig[osigProperty] = outputSignal[atr]
+          @addNode(ClockDomain,'oSignal',attributesOsig)
 
 
         #console.log val[cd].oChannels # this prints all the output channels
