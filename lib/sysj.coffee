@@ -248,10 +248,11 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
-    jsonfile = require('jsonfile')
-    jsonfile.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "generate_subsystem.json", {}, {spaces: 2}, (err) ->
-    if err
-      console.error(err)
+    jsonfile = require('jsonfile') # require the jsonfile package
+    obj = {}
+    jsonfile.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "generate_subsystem.json", obj, {spaces: 2}, (err) ->
+      if err
+        console.error(err)
     )
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
       if (err)
