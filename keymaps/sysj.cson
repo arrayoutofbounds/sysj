@@ -10,4 +10,5 @@
 'atom-workspace':
   'ctrl-alt-s': 'sysj:compile'
   'ctrl-alt-a': 'sysj:run'
+  'ctrl-alt-j': 'sysj:generate_subsystem'
   #'ctrl-alt-k': 'sysj:kill'

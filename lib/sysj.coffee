@@ -29,10 +29,110 @@ module.exports = Sysj =
     'sysj:run': => @run()
     'sysj:create': => @create()
     'sysj:compile all': => @compileAll()
+    'sysj:generate_subsystem': => @parseJson()
     #'sysj:kill': => @kill()
     #'sysj:toggle': => @toggle()
 
     SysjView.get().setChildren(0) # set to 0 when syjs package is loaded
+
+  createXml: (dir,val,subsystem) ->
+    # this method takes in the value and name of the subsystem respectively
+    console.log val
+    console.log subsystem
+    path = require 'path'
+    fs = require 'fs'
+    # steps:
+    # create a new file for the subsystem
+    # iterate the object and get all clock domains
+    clockDomains = []
+    oChannels = []
+    iChannels = []
+    pathToXml = dir + path.sep + "config" + path.sep + subsystem + ".xml" #create the xml file
+    ###builder = require('xmlbuilder')
+    xml = builder.create(
+      {
+        System: {
+          '@xmlns':'http://systemjtechnology.com',
+          '#text': 'adad'
+        }
+      }
+    )
+    ###
+    #fs.appendFileSync(pathToXml,xml)
+
+    # use libxml and construct a xml
+    libxml = require("libxmljs")
+    doc = new (libxml.Document) # this starts a new xml document to create
+    a = doc.node('System').attr({xmlns:'http://systemjtechnology.com'})
+    b = a.node('SubSystem').attr({Name: '' + subsystem,Local:'true'})
+    #a = a.node('random') # this added to the root node and is a sibling of b
+
+    # now go throught the SubSystem and get all clock domains
+    for cd of val
+      if val.hasOwnProperty(cd)
+        console.log cd # this just prints the name of the clock domain inside
+        clockDomains.push cd
+        #console.log val[cd]
+        cdNode = b.node('ClockDomain').attr({Name:''+cd,Class:val[cd].Class + ''}) # this adds clock domains as siblings but also children of SubSystem
+
+        # now go through and add channels
+        if val[cd].oChannels != undefined
+          oChannels = val[cd].oChannels
+        if val[cd].iChannels != undefined
+          iChannels = val[cd].iChannels
+
+        for oc in oChannels # if nothing is in ochannel array then its ok as nothing happens
+          console.log oc
+          cdNode.node('oChannel').attr({Name:'' + oc.Name,To:'' + oc.To})
+
+        for ic in iChannels # if nothing is in ochannel array then its ok as nothing happens
+          console.log ic
+          cdNode.node('iChannel').attr({Name:'' + ic.Name,From:'' + ic.From})
+
+
+        #console.log val[cd].oChannels # this prints all the output channels
+
+
+    console.log clockDomains # prints all the clock domains in the sub system
+
+    fs.writeFileSync(pathToXml,doc.toString())
+
+
+  readJson: (pathToJsonFile)  ->
+    jsonfile = require('jsonfile')
+    @objectRead = jsonfile.readFileSync(pathToJsonFile)
+    console.log @objectRead
+
+    #back up npm package incase you want to change the json files attributes.
+    #json = require('json-file');
+    #file  = json.read(pathToJsonFile) # this is done syncronously .
+    #@objectRead = file.data
+    #console.log @objectRead # print the data in the json file
+
+
+  parseJson: ->
+    editor = atom.workspace.getActivePaneItem()
+    path = require 'path'
+    file = editor?.buffer.file
+    filePath = file?.path
+    dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
+    dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
+
+    console.log "dir when parsing json is " + dir
+    @subsystems = []
+    pathToJsonFile = dir + path.sep + "projectSettings" + path.sep + "generate_subsystem.json"
+
+    @readJson(pathToJsonFile) # the object read is given a value
+    for subsystem of @objectRead # go through each object of the data from the file
+      if @objectRead.hasOwnProperty(subsystem)
+        val = @objectRead[subsystem] # val is the actual subystem object
+        console.log "property is " + subsystem
+        @subsystems.push subsystem
+        #console.log "value name is " + val.name
+        # NOW SEND each sub system to a method which reads through it and writes it to its own xml file
+        @createXml(dir,val,subsystem)
+
+    console.log "subsystems are " + @subsystems # this prints the list of all subystems in the json file
 
 
   showCompileDialog: -> # this shows the compile dialog if the compile dialog variable is false, else it does nothing because the dialog must be open
