@@ -243,11 +243,18 @@ module.exports = Sysj =
     #    console.log "error occurred"
     #  console.log "file saved"
     #)
+    fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "generate_subsystem.json", "", (err) ->
+      if (err)
+        console.log "error occurred"
+      console.log "file saved"
+    )
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt", "", (err) ->
       if (err)
         console.log "error occurred"
       console.log "file saved"
     )
+    pathToJavaf = directoryChosen +  path.sep + "java" + path.sep
+    fs.writeFileSync(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt",pathToJavaf)
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathToJdk.txt", "", (err) ->
       if (err)
         console.log "error occurred"
@@ -443,6 +450,8 @@ module.exports = Sysj =
         else # mac or linux
           externalJars = externalJars + ":" + fileContentsArray[counter]
         counter++
+
+
 
       # this moves the class and java compiled files to the class folder
       command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
