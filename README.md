@@ -19,7 +19,7 @@ Package which helps compile and run SystemJ programs. It works Windows, OSX and 
 - Run subsystems (the xml files)
 - Create new SystemJ project
 - Use external java files in your project
-- Generate subsystems 
+- Generate subsystems
 
 ### Dependencies (atom packages that also need to be download)
 
