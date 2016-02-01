@@ -605,7 +605,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
+    command = jdkPath + ' -classpath \"' + pathToJar + externalJars +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
