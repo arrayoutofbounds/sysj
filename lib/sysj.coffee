@@ -571,6 +571,36 @@ module.exports = Sysj =
       i++
 
 
+    # a represents Windows
+    # rest represent unix or linux
+    a = 1
+    @OSName = ""
+    if (navigator.appVersion.indexOf("Win")!=-1)
+      @OSName="Windows"
+      a = 1
+    if (navigator.appVersion.indexOf("Mac")!=-1)
+      @OSName="MacOS"
+      a = 0
+    if (navigator.appVersion.indexOf("X11")!=-1)
+      @OSName="UNIX"
+      a = 0
+    if (navigator.appVersion.indexOf("Linux")!=-1)
+      @OSName="Linux"
+      a = 0
+
+    fs  = require("fs");
+    fileContentsArray = fs.readFileSync(dir + path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt").toString().split('\n');
+    externalJars = ""
+    arrayLength = fileContentsArray.length
+    counter = 0
+    while counter < arrayLength
+      if a # windows
+        externalJars = externalJars + ";" + fileContentsArray[counter]
+      else # mac or linux
+        externalJars = externalJars + ":" + fileContentsArray[counter]
+      counter++
+
+
     # go through the source folder and append the file path of each file
 
 
