@@ -610,8 +610,9 @@ module.exports = Sysj =
             (
              if (stderr)
                 #console.log("child processes failed with error code: " + err.code)
-                atom.notifications.addError "Compilation failed", detail: stderr
+                #atom.notifications.addError "Compilation failed", detail: stderr
                 SysjView.get().getConsolePanel().warn(stderr)
+                organise dir
               else
                 atom.notifications.addSuccess "Compilation successful", detail: stdout
                 SysjView.get().getConsolePanel().log(stdout,level="info")
