@@ -10,6 +10,12 @@ module.exports = Sysj =
   flag: false
   clickHappened:false
   compileDialog: false
+  systemClockDomains: {} # this holds the map of clock domains with their respective subsystems. each key is a Subsystem and value is list of cd it has
+  systemNodes: {} # this holds the system nodes so things can be added later
+  subsystems: []
+  subsystemContent: []
+  systemClockDomainNames: {}
+  clockDomainsFromCdName: {}
 
   setCompileDialogExistence: (value) -> # sets the existence of the compile dialog so when it is asked to be showed it can be referred
     @compileDialog = value
@@ -45,6 +51,7 @@ module.exports = Sysj =
     # create a new file for the subsystem
     # iterate the object and get all clock domains
     clockDomains = []
+    clockDomainValues = []
     oChannels = []
     iChannels = []
     pathToXml = dir + path.sep + "config" + path.sep + subsystem + ".xml" #create the xml file
@@ -52,6 +59,7 @@ module.exports = Sysj =
 
 
     System = builder.create("System")
+    @systemNodes[subsystem.toString()] = System
     System.att('xmlns','http://systemjtechnology.com') # add attribute to the root element
     System.com('<Interconnection>')
     System.com('<Link Type="Destination">')
@@ -70,7 +78,9 @@ module.exports = Sysj =
         console.log cd # this just prints the name of the clock domain inside
         clockDomains.push cd
         #console.log val[cd]
+        clockDomainValues.push val[cd]
 
+        @clockDomainsFromCdName[cd.toString()] = val[cd]
         # create the clock domain tag
         ClockDomain = SubSystem.ele('ClockDomain',{'Name':cd.toString(),'Class': (val[cd].Class).toString()}) # this adds clock domains as siblings but also children of SubSystem
 
@@ -138,6 +148,9 @@ module.exports = Sysj =
     console.log clockDomains # prints all the clock domains in the sub system
     #fs.writeFileSync(pathToXml,doc.toString())
 
+    # write the clock domains for the subystem in the map
+    @systemClockDomains[subsystem.toString()] = clockDomainValues
+    @systemClockDomainNames[subsystem.toString()] = clockDomains
 
     # convert to string and then write to the xml file
     converted = System.end({ pretty: true, indent: '  ', newline: '\n' })
@@ -169,8 +182,11 @@ module.exports = Sysj =
     dirToConfig = filePath.substring(0,filePath.lastIndexOf(path.sep + ""))
     dir = dirToConfig.substring(0,dirToConfig.lastIndexOf(path.sep + ""))
 
+    @mainDir = dir
+
     console.log "dir when parsing json is " + dir
     @subsystems = []
+    @subsystemContent = []
     pathToJsonFile = dir + path.sep + "projectSettings" + path.sep + "generate_subsystem.json"
 
     @readJson(pathToJsonFile) # the object read is given a value
@@ -179,11 +195,138 @@ module.exports = Sysj =
         val = @objectRead[subsystem] # val is the actual subystem object
         console.log "property is " + subsystem
         @subsystems.push subsystem
+        @subsystemContent.push val # this pushes the actual value of the subsystem into the array
         #console.log "value name is " + val.name
         # NOW SEND each sub system to a method which reads through it and writes it to its own xml file
         @createXml(dir,val,subsystem)
 
+
     console.log "subsystems are " + @subsystems # this prints the list of all subystems in the json file
+
+    # go through all the clock domains in each subsystem and check if it is in local subsystem
+    # if it is not then add the appropriate subsystem to the local subsystem xml file.
+    @addNonLocalSubsystems(@subsystems) # pass in the subsystems object so it does not become undefined
+
+    #sn = @systemNodes["SS1"]
+    #added = sn.ele("SubSystem",{'Name':"SS2"})
+    #added.ele("ClockDomain",{'Name':"CD2"})
+    #pathToXml = dir + path.sep + "config" + path.sep + "SS1" + ".xml"
+    #converted = added.end({ pretty: true, indent: '  ', newline: '\n' })
+    #fs.writeFileSync(pathToXml,converted)
+
+    #console.log @systemClockDomains
+
+  addNonLocalSubsystems: (subsystems) ->
+    # go through each clock domain and look at the channels
+    # if any of the output or input channels is not in the local subsystem then go the appropriate clock domain and add
+    # the channels related to the local clock domain
+    for s in subsystems
+      console.log s
+      subsystemContent = @systemClockDomains[s.toString()] #gets subsystems content based on subsystem name
+      console.log subsystemContent # prints the subsystem content with clock domains out
+
+      # so for each subsystem we have that subsystems clock domains
+      # now go thrpugh the clock domains and check the input and output channels to and from attributes
+
+      for cd in subsystemContent
+        #console.log cd  # prints each of the clock domains objects for this subsystem out
+        if cd.iChannels != undefined
+          for i in cd.iChannels
+            from = i.From # get the "From" attribute into a variable
+            fromCd = from.split(".")[0]
+            console.log fromCd
+            isSameSubSystem = @checkIfSameSubSystem(s,fromCd) # if true then in same subsystem so dont do anything
+
+            if isSameSubSystem == false
+              # so the clock domain is not in the same subsystem
+              # so have to look at other subsystems
+              subsys = @findSubSystem(fromCd,subsystems)
+              console.log subsys # prints the subsystem that the "fromCd" clockdomain is in
+
+              cdName = @cdGetName(s,cd)
+              console.log cdName # gets the clock domain name of the local clockdomain
+
+              # now go to that subsystem and then get the input and output channels related to the clock domain cd
+              subsysContent = @systemClockDomains[subsys.toString()]
+              @writeChannels(s,subsysContent,subsys,fromCd,cdName)
+
+  writeChannels: (subsystemChosen,subsysContent,subsys,fromCd,cdName)->
+    sn = @systemNodes[subsystemChosen.toString()]
+    added = sn.ele("SubSystem",{'Name':"" + subsys,"Local":"false"}) # subsys is the name of the subsystem being added at the bottom
+
+
+    console.log subsystemChosen # name of the subsystem to write to at the end in the file
+    console.log subsysContent # content of the subsys variable
+    console.log subsys # name of the subsystem to get cd and channels from
+    console.log fromCd # the clock domain that you need to find in the subsysContent and then get channels from
+    console.log cdName # name of the local clock domain, so you know what to look for in the to or from attributes in channels
+
+    toLookClockDomain = @clockDomainsFromCdName[fromCd] # the clock domain content of the non local clock domain s
+
+    added_cd = added.ele("ClockDomain",{"Name":fromCd,"Class":toLookClockDomain.Class}) # add a clock domain node
+
+    if toLookClockDomain.iChannels != undefined
+      for i in toLookClockDomain.iChannels
+        fromVar = i.From
+        fromVar_Cd = fromVar.split(".")[0]
+
+        if fromVar_Cd == cdName
+          # then this channel is the one to write
+          added_channel = added_cd.ele("iChannel",{"Name":i.Name,"From":fromVar})
+
+    if toLookClockDomain.oChannels != undefined
+      for j in toLookClockDomain.oChannels
+        toVar = j.To
+        toVar_Cd = toVar.split(".")[0]
+
+        if toVar_Cd == cdName
+          # then this channel is the one to write
+          added_channel2 = added_cd.ele("oChannel",{"Name":j.Name,"To":toVar})
+
+    path = require 'path'
+    fs = require 'fs'
+    pathToXml = @mainDir + path.sep + "config" + path.sep + subsystemChosen + ".xml"
+    converted = added.end({ pretty: true, indent: '  ', newline: '\n' })
+    fs.writeFileSync(pathToXml,converted)
+
+    # subsys content is the one that you have to get the channels from
+    # subsystem chosen is the one that you have to write to
+    ###
+    for clockD in subsysContent
+      if clockD.iChannels != undefined
+        for i in clockD.iChannels
+          fromVar = i.From
+          fromVar_Cd = fromVar.split(".")[0]
+
+          if fromVar_Cd == cdName
+            # then this channel has to be put in clock domains
+    ###
+
+  cdGetName: (subsystemToLook,clockdomain) ->
+    cds = @systemClockDomains[subsystemToLook.toString()]
+    for cd in @subsystemContent
+      for prop of cd
+        if cd.hasOwnProperty(prop)
+          if cd[prop] == clockdomain
+            return prop.toString()
+
+
+
+  findSubSystem: (fromCd,subsystems) ->
+
+    for subsys in subsystems
+      for c in @systemClockDomainNames[subsys.toString()]
+        if c == fromCd
+          return subsys
+
+
+  checkIfSameSubSystem: (s,fromCd) ->
+
+    for c in @systemClockDomainNames[s.toString()]
+      if fromCd == c
+        return true
+    return false
+
 
 
   showCompileDialog: -> # this shows the compile dialog if the compile dialog variable is false, else it does nothing because the dialog must be open
