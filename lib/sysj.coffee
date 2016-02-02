@@ -206,16 +206,9 @@ module.exports = Sysj =
     # go through all the clock domains in each subsystem and check if it is in local subsystem
     # if it is not then add the appropriate subsystem to the local subsystem xml file.
     @addNonLocalSubsystems(@subsystems) # pass in the subsystems object so it does not become undefined
-
-    #sn = @systemNodes["SS1"]
-    #added = sn.ele("SubSystem",{'Name':"SS2"})
-    #added.ele("ClockDomain",{'Name':"CD2"})
-    #pathToXml = dir + path.sep + "config" + path.sep + "SS1" + ".xml"
-    #converted = added.end({ pretty: true, indent: '  ', newline: '\n' })
-    #fs.writeFileSync(pathToXml,converted)
-
     #console.log @systemClockDomains
 
+  # this method is to add non local subsystems to the local subsystems file. The parameters are the list of strings of subsystems
   addNonLocalSubsystems: (subsystems) ->
     # go through each clock domain and look at the channels
     # if any of the output or input channels is not in the local subsystem then go the appropriate clock domain and add
@@ -227,7 +220,6 @@ module.exports = Sysj =
 
       # so for each subsystem we have that subsystems clock domains
       # now go thrpugh the clock domains and check the input and output channels to and from attributes
-
       for cd in subsystemContent
         #console.log cd  # prints each of the clock domains objects for this subsystem out
         if cd.iChannels != undefined
