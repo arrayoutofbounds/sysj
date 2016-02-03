@@ -210,6 +210,7 @@ module.exports = Sysj =
 
   # this method is to add non local subsystems to the local subsystems file. The parameters are the list of strings of subsystems
   addNonLocalSubsystems: (subsystems) ->
+    console.log subsystems # this works!
     # go through each clock domain and look at the channels
     # if any of the output or input channels is not in the local subsystem then go the appropriate clock domain and add
     # the channels related to the local clock domain
@@ -217,10 +218,10 @@ module.exports = Sysj =
       console.log s
       subsystemContent = @systemClockDomains[s.toString()] #gets subsystems content based on subsystem name
       console.log subsystemContent # prints the subsystem content with clock domains out
-
-      # so for each subsystem we have that subsystems clock domains
-      # now go thrpugh the clock domains and check the input and output channels to and from attributes
       for cd in subsystemContent
+        console.log "doing cd"
+        # so for each subsystem we have that subsystems clock domains
+        # now go thrpugh the clock domains and check the input and output channels to and from attributes
         #console.log cd  # prints each of the clock domains objects for this subsystem out
         if cd.iChannels != undefined
           for i in cd.iChannels
@@ -242,6 +243,26 @@ module.exports = Sysj =
               subsysContent = @systemClockDomains[subsys.toString()]
               @writeChannels(s,subsysContent,subsys,fromCd,cdName)
 
+        if cd.oChannels != undefined
+          for o in cd.oChannels
+            to = o.To # get the "From" attribute into a variable
+            toCd = to.split(".")[0]
+            console.log toCd
+            isSameSubSystem2 = @checkIfSameSubSystem(s,toCd) # if true then in same subsystem so dont do anything
+
+            if isSameSubSystem2 == false
+              # so the clock domain is not in the same subsystem
+              # so have to look at other subsystems
+              subsys2 = @findSubSystem(toCd,subsystems)
+              console.log subsys # prints the subsystem that the "fromCd" clockdomain is in
+
+              cdName2 = @cdGetName(s,cd)
+              console.log cdName2 # gets the clock domain name of the local clockdomain
+
+              # now go to that subsystem and then get the input and output channels related to the clock domain cd
+              subsysContent2 = @systemClockDomains[subsys2.toString()]
+              @writeChannels(s,subsysContent2,subsys2,toCd,cdName2)
+
   writeChannels: (subsystemChosen,subsysContent,subsys,fromCd,cdName)->
     sn = @systemNodes[subsystemChosen.toString()]
     added = sn.ele("SubSystem",{'Name':"" + subsys,"Local":"false"}) # subsys is the name of the subsystem being added at the bottom
@@ -262,7 +283,7 @@ module.exports = Sysj =
         fromVar = i.From
         fromVar_Cd = fromVar.split(".")[0]
 
-        if fromVar_Cd == cdName
+        if fromVar_Cd == cdName # means that the "From" attribute has the local subsystems name in it
           # then this channel is the one to write
           added_channel = added_cd.ele("iChannel",{"Name":i.Name,"From":fromVar})
 
@@ -271,7 +292,7 @@ module.exports = Sysj =
         toVar = j.To
         toVar_Cd = toVar.split(".")[0]
 
-        if toVar_Cd == cdName
+        if toVar_Cd == cdName  # means that the "To" attribute has the local subsystems name in it 
           # then this channel is the one to write
           added_channel2 = added_cd.ele("oChannel",{"Name":j.Name,"To":toVar})
 
