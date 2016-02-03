@@ -930,9 +930,9 @@ module.exports = Sysj =
         console.log jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
         terminal = @createTerminal()
         if externalJars.length == 0
-          terminal.spawn(jdkPath + " -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"" + jdkPath,["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+          terminal.spawn(jdkPath + " -classpath " + '\"' + pathToJar + @pathToClass + '\"' + " com.systemj.SystemJRunner " + '\"' + filePath + '\"',"" + jdkPath,["-classpath", "\"" + pathToJar + @pathToClass + "\"" , 'com.systemj.SystemJRunner',"\"" + filePath + "\""])
         else
-          terminal.spawn(jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"" + jdkPath,["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+          terminal.spawn(jdkPath + " -classpath " + '\"' + pathToJar + externalJars + @pathToClass + '\"' + " com.systemj.SystemJRunner " + '\"' + filePath + '\"',"" + jdkPath,["-classpath", "\"" + pathToJar + externalJars + @pathToClass + "\"" , 'com.systemj.SystemJRunner',"\"" + filePath + "\""])
       else
         window.alert("Please ensure the correct xml file format is run")
 
