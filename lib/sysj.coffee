@@ -845,7 +845,7 @@ module.exports = Sysj =
           )
         findsysj p for p in paths
 
-        pathToJar = packagePath + path.sep + "jar" + path.sep + "\\*"
+        pathToJar = packagePath + path.sep + "jar" + path.sep + "*"
         console.log pathToJar
 
         # a represents Windows
