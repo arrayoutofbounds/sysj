@@ -868,9 +868,9 @@ module.exports = Sysj =
         # path to the class files
         @pathToClass = ""
         if (a)
-          @pathToClass = ";" + dir + path.sep + "class" + path.sep
+          @pathToClass = ";" + dir + path.sep + "class"
         else
-          @pathToClass = ":" + dir + path.sep + "class" + path.sep
+          @pathToClass = ":" + dir + path.sep + "class"
 
         #command = 'java -classpath \"' + pathToJar + @pathToClass +  '\" com.systemj.SystemJRunner ' + filePath
 
