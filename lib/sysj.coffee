@@ -292,7 +292,7 @@ module.exports = Sysj =
         toVar = j.To
         toVar_Cd = toVar.split(".")[0]
 
-        if toVar_Cd == cdName  # means that the "To" attribute has the local subsystems name in it 
+        if toVar_Cd == cdName  # means that the "To" attribute has the local subsystems name in it
           # then this channel is the one to write
           added_channel2 = added_cd.ele("oChannel",{"Name":j.Name,"To":toVar})
 
@@ -566,6 +566,8 @@ module.exports = Sysj =
 
       if jdkPath.length == 0
         jdkPath = "java"
+      else
+        jdkPath = '\"' + jdkPath + '\"' # this escapes any spaces in the jdk path if it is entered manually.
 
       console.log "dirToConfig is " + dirToConfig
       console.log "dir is " + dir
@@ -616,7 +618,7 @@ module.exports = Sysj =
 
 
       # this moves the class and java compiled files to the class folder
-      command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' + toAppend + " " + filePath
+      command = jdkPath + ' -classpath \"' + pathToJar + externalJars + '\" JavaPrettyPrinter -d \"' + dir + '' + path.sep + 'class\" ' + toAppend + ' \"' + filePath + '\"'
 
       #exec = require('sync-exec')
       #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -702,6 +704,8 @@ module.exports = Sysj =
 
     if jdkPath.length == 0
       jdkPath = "java"
+    else
+      jdkPath = '\"' + jdkPath + '\"' # this escapes any spaces in the jdk path if it is entered manually.
 
     console.log "dirToConfig is " + dirToConfig
     console.log "dir is " + dir
@@ -722,9 +726,13 @@ module.exports = Sysj =
     files = fs.readdirSync dirToSourceFolder
     console.log files
     i = 0
-    allSysjFiles = ""
+    allSysjFiles = undefined
     while i < files.length
-      allSysjFiles = allSysjFiles + dirToSourceFolder + path.sep + files[i] + " "
+      if allSysjFiles == undefined
+        allSysjFiles = '\"' + dirToSourceFolder + '' +path.sep + files[i] + '\" '
+      else
+        allSysjFiles = allSysjFiles + '\"' +  dirToSourceFolder + '' +  path.sep + files[i] + '\" '
+      console.log allSysjFiles
       i++
 
 
@@ -762,7 +770,7 @@ module.exports = Sysj =
 
 
     # this moves the class and java compiled files to the class folder
-    command = jdkPath + ' -classpath \"' + pathToJar + externalJars +  '\" JavaPrettyPrinter -d ' + dir + path.sep + 'class ' +  allSysjFiles
+    command = jdkPath + ' -classpath \"' + pathToJar + externalJars +  '\" JavaPrettyPrinter -d \"' + dir + '' + path.sep + 'class\" ' + allSysjFiles
 
     #exec = require('sync-exec')
     #console.log(exec('/home/anmol/Desktop/Research/sjdk-v2.0-151-g539eeba/bin/sysjc',['' + filePath]));
@@ -916,13 +924,15 @@ module.exports = Sysj =
 
         if jdkPath.length == 0
           jdkPath = "java"
+        else
+          jdkPath = '\"' + jdkPath + '\"' # this escapes any spaces in the jdk path if it is entered manually.
 
         console.log jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath
         terminal = @createTerminal()
         if externalJars.length == 0
-          terminal.spawn(jdkPath + " -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+          terminal.spawn(jdkPath + " -classpath " + pathToJar + @pathToClass + " com.systemj.SystemJRunner " + filePath,"" + jdkPath,["-classpath", "" + pathToJar + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
         else
-          terminal.spawn(jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"java",["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
+          terminal.spawn(jdkPath + " -classpath " + pathToJar + externalJars + @pathToClass + " com.systemj.SystemJRunner " + filePath,"" + jdkPath,["-classpath", "" + pathToJar + externalJars + @pathToClass , 'com.systemj.SystemJRunner',"" + filePath])
       else
         window.alert("Please ensure the correct xml file format is run")
 
