@@ -1,0 +1,9 @@
+'scopeName': 'source.sysj'  
+'name': 'SystemJ'  
+'fileTypes': ['sysj']  
+'patterns': [  
+  {
+    'comment': 'need to define the whole SystemJ grammar for the synthax highlighing?'
+    'include': 'source.java'
+  }
+]
