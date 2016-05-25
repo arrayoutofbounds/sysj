@@ -415,7 +415,7 @@ module.exports = Sysj =
         console.log "error occurred"
       console.log "file saved"
     )
-    pathToJavaf = directoryChosen +  path.sep + "java" + path.sep
+    pathToJavaf = directoryChosen +  path.sep + "java"
     fs.writeFileSync(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathsToExternalLibraries.txt",pathToJavaf)
     fs.writeFile(directoryChosen +  path.sep + "projectSettings" + path.sep + "pathToJdk.txt", "", (err) ->
       if (err)
